@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.DataService", "Geone.DataService\Geone.DataService.csproj", "{7D8AF685-B349-427D-877F-DAE9B0FED77D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.DataService.Core", "Geone.DataService.Core\Geone.DataService.Core.csproj", "{B4811D91-4BB8-4405-820B-BA5B6456A045}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D8AF685-B349-427D-877F-DAE9B0FED77D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D8AF685-B349-427D-877F-DAE9B0FED77D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D8AF685-B349-427D-877F-DAE9B0FED77D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D8AF685-B349-427D-877F-DAE9B0FED77D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F74B427C-DD88-4F56-8D12-C0F7E40CD4D5}
+	EndGlobalSection
+EndGlobal
