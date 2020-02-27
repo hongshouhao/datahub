@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceStack.OrmLite;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Geone.DataService.Controllers
 {

@@ -1,6 +1,8 @@
 ﻿using Geone.DataService.Core;
 using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.REST;
+using Geone.DataService.Core.SOAP;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -38,8 +40,10 @@ namespace Geone.DataService.Models
                     switch (serviceMeta.Type)
                     {
                         case ServiceType.REST:
+                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<RestCommandMeta>();
                             break;
                         case ServiceType.SOAP:
+                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<SoapCommandMeta>();
                             break;
                         case ServiceType.DBaaS:
                             serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<DbCommandMeta>();

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.DataService", "Geone.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.DataService.Core", "Geone.DataService.Core\Geone.DataService.Core.csproj", "{B4811D91-4BB8-4405-820B-BA5B6456A045}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XmlSampleGenerator", "..\XmlSchemaClassGenerator-master\XmlSampleGenerator\XmlSampleGenerator.csproj", "{5AE3A564-2ED1-456D-B2A4-DE9B11A654B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4811D91-4BB8-4405-820B-BA5B6456A045}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AE3A564-2ED1-456D-B2A4-DE9B11A654B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AE3A564-2ED1-456D-B2A4-DE9B11A654B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AE3A564-2ED1-456D-B2A4-DE9B11A654B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE3A564-2ED1-456D-B2A4-DE9B11A654B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

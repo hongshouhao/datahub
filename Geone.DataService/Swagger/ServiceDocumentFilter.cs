@@ -1,14 +1,11 @@
 ﻿using Geone.DataService.Core;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Models;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Geone.DataService.Swagger
 {

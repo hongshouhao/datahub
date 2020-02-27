@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Geone.DataService.Core
+﻿namespace Geone.DataService.Core
 {
     public interface IServiceContent
     {

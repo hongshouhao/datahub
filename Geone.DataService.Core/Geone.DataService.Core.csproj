@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,6 +9,9 @@
     <Compile Remove="SOAP\HttpHelper.cs" />
     <Compile Remove="SOAP\HttpHelper2.cs" />
     <Compile Remove="SOAP\MainWindow.xaml.cs" />
+    <Compile Remove="SOAP\WebServiceClient - 复制.cs" />
+    <Compile Remove="SOAP\WebServiceClient.cs" />
+    <Compile Remove="SOAP\WebServiceClient_.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,7 +28,9 @@
 
   <ItemGroup>
     <Folder Include="Aggregate\" />
-    <Folder Include="REST\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\XmlSchemaClassGenerator-master\XmlSampleGenerator\XmlSampleGenerator.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,7 +1,5 @@
 ﻿using Geone.DataService.Core.Repository;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Geone.DataService.Core.Exceptions
 {
