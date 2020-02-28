@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
+using Geone.DataService.Core.SOAP;
 
 namespace Geone.DataService.Controllers
 {
@@ -14,18 +15,23 @@ namespace Geone.DataService.Controllers
     {
         private readonly ILogger<ServiceController> _logger;
         private readonly DBaaSExcutor _dbaasExcutor;
+        private readonly SoapExcutor _soapExcutor;
         private readonly MetaRepository _repository;
 
-        public ServiceController(MetaRepository repository, DBaaSExcutor dbaasExcutor, ILogger<ServiceController> logger)
+        public ServiceController(MetaRepository repository,
+            DBaaSExcutor dbaasExcutor,
+            SoapExcutor soapExcutor,
+            ILogger<ServiceController> logger)
         {
             _repository = repository;
             _dbaasExcutor = dbaasExcutor;
+            _soapExcutor = soapExcutor;
             _logger = logger;
         }
 
         [HttpPost]
         [Route("{name}")]
-        public string Post(string name, [FromBody]Dictionary<string, object> arguments)
+        public string Post(string name, [FromBody]object arguments)
         {
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.Deserialize<ServiceMeta>();
@@ -35,7 +41,7 @@ namespace Geone.DataService.Controllers
                 case ServiceType.REST:
                     throw new NotImplementedException();
                 case ServiceType.SOAP:
-                    throw new NotImplementedException();
+                    return _soapExcutor.Excute(serviceMeta, arguments);
                 case ServiceType.DBaaS:
                     return _dbaasExcutor.Excute(serviceMeta, arguments);
                 case ServiceType.Aggregate:

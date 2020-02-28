@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Geone.DataService.Core;
 using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.SOAP;
 using Geone.DataService.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,6 +37,7 @@ namespace Geone.DataService
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
+            services.AddSingleton<SoapExcutor>();
 
             services.AddSwaggerGen(options =>
             {
