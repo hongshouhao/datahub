@@ -1,8 +1,4 @@
-﻿using Microsoft.Xml.XMLGen;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Schema;
 
 namespace Geone.DataService.Core.SOAP
@@ -22,7 +18,7 @@ namespace Geone.DataService.Core.SOAP
             {
                 Formatting = Formatting.Indented
             };
-            XmlSampleGenerator genr = new XmlSampleGenerator(schemas, qname);
+         //   XmlSampleGenerator genr = new XmlSampleGenerator(schemas, qname);
         }
     }
 }
