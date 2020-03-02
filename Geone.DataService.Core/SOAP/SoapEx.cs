@@ -23,6 +23,7 @@ namespace Geone.DataService.Core.SOAP
                 Formatting = Formatting.Indented
             };
             XmlSampleGenerator genr = new XmlSampleGenerator(schemas, qname);
+            genr.WriteXml(textWriter);
         }
     }
 }

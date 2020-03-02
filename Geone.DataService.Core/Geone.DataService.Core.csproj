@@ -24,7 +24,6 @@
   <ItemGroup>
     <Folder Include="Aggregate\" />
     <Folder Include="Connected Services\" />
-    <Folder Include="REST\" />
   </ItemGroup>
 
   <ItemGroup>

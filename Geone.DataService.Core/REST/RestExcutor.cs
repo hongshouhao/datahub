@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace Geone.DataService.Core.REST
 {
     public class RestExcutor
@@ -38,6 +39,9 @@ namespace Geone.DataService.Core.REST
             {
                 throw new ArgumentException($"服务内容不是合法的{nameof(RestCommandMeta)}对象");
             }
+
+            cmd.Parameters.AddRange(service.Parameters);
+
 
 
             return "";

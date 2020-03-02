@@ -8,7 +8,7 @@ using System.Xml.Schema;
 
 namespace Geone.DataService.Core.SOAP
 {
-    class WsdlParser
+    public class WsdlParser
     {
         public ServiceDescription serviceDescription;
 
