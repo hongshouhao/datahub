@@ -3,10 +3,8 @@ using Newtonsoft.Json.Linq;
 using SoapHttpClient;
 using SoapHttpClient.Enums;
 using System;
-using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Schema;
 
 namespace Geone.DataService.Core.SOAP
 {
@@ -14,7 +12,6 @@ namespace Geone.DataService.Core.SOAP
     {
         public SoapExcutor()
         {
-
         }
 
         public string Excute(ServiceMeta service, object arguments)
