@@ -1,6 +1,7 @@
 ﻿using Geone.DataService.Core;
 using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.REST;
 using Geone.DataService.Core.SOAP;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,13 +17,16 @@ namespace Geone.DataService.Controllers
         private readonly ILogger<ServiceController> _logger;
         private readonly DBaaSExcutor _dbaasExcutor;
         private readonly MetaRepository _repository;
-        private readonly SoapExcutor _soapExcutor;
+        private readonly SoapEx _soapExcutor;
+        private readonly RestExcutor _restExcutor;
 
-        public ServiceController(MetaRepository repository, DBaaSExcutor dbaasExcutor, SoapExcutor soapExcutor, ILogger<ServiceController> logger)
+
+        public ServiceController(MetaRepository repository, DBaaSExcutor dbaasExcutor, SoapEx soapExcutor, RestExcutor restExcutor,ILogger<ServiceController> logger)
         {
             _repository = repository;
             _dbaasExcutor = dbaasExcutor;
             _soapExcutor = soapExcutor;
+            _restExcutor = restExcutor;
             _logger = logger;
         }
 
@@ -36,9 +40,11 @@ namespace Geone.DataService.Controllers
             switch (serviceMeta.Type)
             {
                 case ServiceType.REST:
-                    throw new NotImplementedException();
+                   return _restExcutor.Excute(serviceMeta, arguments);
+
                 case ServiceType.SOAP:
-                    return _soapExcutor.Excute(serviceMeta, arguments) ;
+                    throw new NotImplementedException();
+                    //return _soapExcutor.Excute(serviceMeta, arguments) ;
                 case ServiceType.DBaaS:
                     return _dbaasExcutor.Excute(serviceMeta, arguments);
                 case ServiceType.Aggregate:

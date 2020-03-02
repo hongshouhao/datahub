@@ -5,10 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="REST\CURLParser.cs" />
+    <Compile Remove="REST\ExtractedParams.cs" />
     <Compile Remove="SOAP\EMethod.cs" />
     <Compile Remove="SOAP\HttpHelper.cs" />
     <Compile Remove="SOAP\HttpHelper2.cs" />
     <Compile Remove="SOAP\MainWindow.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\common-cad\CADLib\Geone.CADLib.CLI\cURL\CURLParser.cs" Link="REST\cURL\CURLParser.cs" />
+    <Compile Include="..\..\common-cad\CADLib\Geone.CADLib.CLI\cURL\Extensions.cs" Link="REST\cURL\Extensions.cs" />
+    <Compile Include="..\..\common-cad\CADLib\Geone.CADLib.CLI\cURL\ExtractedParams.cs" Link="REST\cURL\ExtractedParams.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +32,7 @@
   <ItemGroup>
     <Folder Include="Aggregate\" />
     <Folder Include="Connected Services\" />
+    <Folder Include="REST\cURL\" />
   </ItemGroup>
 
   <ItemGroup>
