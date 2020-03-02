@@ -21,7 +21,7 @@ namespace Geone.DataService.Swagger
         {
             CreateService(swaggerDoc, context);
         }
-         
+
         void CreateService(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             var servicePath = swaggerDoc.Paths.FirstOrDefault(x => x.Key.ToLower() == "/service/{name}");
@@ -53,15 +53,31 @@ namespace Geone.DataService.Swagger
                 mediaType.Schema = new OpenApiSchema();
                 mediaType.Schema.Type = "object";
 
-                Dictionary<string, object> example = new Dictionary<string, object>();
-                foreach (var paramItem in svcMeta.Parameters)
-                {
-                    example.Add(paramItem.Name, GetDefaultValue(paramItem));
-                }
 
-                mediaType.Example = new OpenApiRawString(JsonConvert.SerializeObject(example, Formatting.Indented));
-
+                mediaType.Example = new OpenApiRawString(CreateArgumentExample(svcMeta));
                 swaggerDoc.Paths.Add($"/service/{svcEntity.Name}", pathItem);
+            }
+        }
+
+        string CreateArgumentExample(ServiceMeta svcMeta)
+        {
+            switch (svcMeta.Type)
+            {
+                case ServiceType.REST:
+                    return null;
+                case ServiceType.SOAP:
+                    return "{\"Add\": {\"@xmlns\":\"http://tempuri.org/\", \"intA\" : 1,  \"intB\" : 2}}";
+                case ServiceType.DBaaS:
+                    Dictionary<string, object> dbExample = new Dictionary<string, object>();
+                    foreach (var paramItem in svcMeta.Parameters)
+                    {
+                        dbExample.Add(paramItem.Name, GetDefaultValue(paramItem));
+                    }
+                    return JsonConvert.SerializeObject(dbExample, Formatting.Indented);
+                case ServiceType.Aggregate:
+                    return null;
+                default:
+                    throw new NotSupportedException();
             }
         }
 

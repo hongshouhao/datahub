@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TEST", "TEST\TEST.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Web.Services", "System.Web.Services\System.Web.Services.csproj", "{6EDA1531-EE99-470A-9ADD-5640F8FB3BEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.XmlSampleGenerator", "Geone.XmlSampleGenerator\Geone.XmlSampleGenerator.csproj", "{13B9FBF8-5235-41B9-A1FA-8EC6FD4059DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geone.XmlSampleGenerator", "Geone.XmlSampleGenerator\Geone.XmlSampleGenerator.csproj", "{D8A286B9-A6B7-442E-88FB-3793F3D80E2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{6EDA1531-EE99-470A-9ADD-5640F8FB3BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EDA1531-EE99-470A-9ADD-5640F8FB3BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EDA1531-EE99-470A-9ADD-5640F8FB3BEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13B9FBF8-5235-41B9-A1FA-8EC6FD4059DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13B9FBF8-5235-41B9-A1FA-8EC6FD4059DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13B9FBF8-5235-41B9-A1FA-8EC6FD4059DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13B9FBF8-5235-41B9-A1FA-8EC6FD4059DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A286B9-A6B7-442E-88FB-3793F3D80E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A286B9-A6B7-442E-88FB-3793F3D80E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A286B9-A6B7-442E-88FB-3793F3D80E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A286B9-A6B7-442E-88FB-3793F3D80E2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

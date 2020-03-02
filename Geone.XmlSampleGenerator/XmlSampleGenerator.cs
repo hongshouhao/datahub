@@ -150,7 +150,6 @@ namespace Microsoft.Xml.XMLGen
             }
         }
 
-
         private bool ProcessSchemaSet()
         {
             //Add all the Elements from all schemas into the Elements table
