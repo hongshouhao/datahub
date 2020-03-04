@@ -3,6 +3,9 @@ using Newtonsoft.Json.Linq;
 using SoapHttpClient;
 using SoapHttpClient.Enums;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -14,7 +17,7 @@ namespace Geone.DataService.Core.SOAP
         {
         }
 
-        public string Excute(ServiceMeta service, object arguments)
+        public string Excute(ServiceMeta service, Dictionary<string, object> arguments)
         {
             if (service.Type != ServiceType.SOAP)
                 throw new ArgumentException("服务类型不匹配");
@@ -36,9 +39,18 @@ namespace Geone.DataService.Core.SOAP
             }
 
             XmlDocument xdoc = null;
-            if (arguments != null)
+            if (arguments != null && arguments.Count > 0)
             {
-                xdoc = JsonConvert.DeserializeXmlNode(arguments.ToString());
+                var keyValue = arguments.FirstOrDefault();
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append("{");
+                sb.Append("\"" + keyValue.Key + "\"");
+                sb.Append(":");
+                sb.Append(Convert.ToString(keyValue.Value));
+                sb.Append("}");
+
+                xdoc = JsonConvert.DeserializeXmlNode(sb.ToString());
             }
 
             XElement xele = null;

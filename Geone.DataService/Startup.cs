@@ -1,4 +1,5 @@
 using Geone.DataService.Core;
+using Geone.DataService.Core.Aggregate;
 using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.REST;
@@ -29,8 +30,9 @@ namespace Geone.DataService
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
-            services.AddSingleton<SoapEx>();
+            services.AddSingleton<SoapExcutor>();
             services.AddSingleton<RestExcutor>();
+            services.AddSingleton<AggregateExcutor>();
 
             services.AddSwaggerGen(options =>
             {

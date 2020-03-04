@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Geone.DataService.Core.SOAP
+namespace Geone.DataService.Core.REST
 {
-    public class SoapCommandMeta : IServiceContent
+    public class RestMeta : IServiceContent
     {
-        public string Url { get; set; }
+        public string Curl { get; set; }
+
         public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
     }
 }

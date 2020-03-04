@@ -35,7 +35,9 @@ namespace Geone.DataService.Core.Repository
         {
             using (var db = _dbFactory.Open())
             {
-                db.Delete(new MetaEntity { MetaType = metaType, Name = name });
+                //db.Delete(new MetaEntity { MetaType = metaType, Name = name });
+
+                db.Delete<MetaEntity>("MetaType = @mt and Name = @n", new { mt = metaType, n = name });
             }
         }
 

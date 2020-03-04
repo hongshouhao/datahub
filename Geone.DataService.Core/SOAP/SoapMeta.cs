@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Geone.DataService.Core.SOAP
+﻿namespace Geone.DataService.Core.SOAP
 {
     public class SoapMeta : IServiceContent
     {

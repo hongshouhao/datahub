@@ -11,6 +11,7 @@
     <Compile Remove="SOAP\HttpHelper.cs" />
     <Compile Remove="SOAP\HttpHelper2.cs" />
     <Compile Remove="SOAP\MainWindow.xaml.cs" />
+    <Compile Remove="SOAP\SoapCommandMeta.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Aggregate\" />
     <Folder Include="Connected Services\" />
     <Folder Include="REST\cURL\" />
   </ItemGroup>

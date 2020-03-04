@@ -64,7 +64,13 @@ namespace Geone.DataService.Swagger
             switch (svcMeta.Type)
             {
                 case ServiceType.REST:
-                    return null;
+                    Dictionary<string, object> restExample = new Dictionary<string, object>();
+                    foreach (var paramItem in svcMeta.Parameters)
+                    {
+                        restExample.Add(paramItem.Name, GetDefaultValue(paramItem));
+                    }
+                    return JsonConvert.SerializeObject(restExample, Formatting.Indented);
+
                 case ServiceType.SOAP:
                     return "{\"Add\": {\"@xmlns\":\"http://tempuri.org/\", \"intA\" : 1,  \"intB\" : 2}}";
                 case ServiceType.DBaaS:
@@ -75,7 +81,13 @@ namespace Geone.DataService.Swagger
                     }
                     return JsonConvert.SerializeObject(dbExample, Formatting.Indented);
                 case ServiceType.Aggregate:
-                    return null;
+                    Dictionary<string, object> aggregateExample = new Dictionary<string, object>();
+                    foreach (var paramItem in svcMeta.Parameters)
+                    {
+                        aggregateExample.Add(paramItem.Name, GetDefaultValue(paramItem));
+                    }
+                    return JsonConvert.SerializeObject(aggregateExample, Formatting.Indented);
+
                 default:
                     throw new NotSupportedException();
             }

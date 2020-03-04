@@ -40,10 +40,10 @@ namespace Geone.DataService.Models
                     switch (serviceMeta.Type)
                     {
                         case ServiceType.REST:
-                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<RestCommandMeta>();
+                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<RestMeta>();
                             break;
                         case ServiceType.SOAP:
-                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<SoapCommandMeta>();
+                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<SoapMeta>();
                             break;
                         case ServiceType.DBaaS:
                             serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<DbCommandMeta>();

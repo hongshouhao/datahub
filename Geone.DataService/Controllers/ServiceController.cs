@@ -1,4 +1,5 @@
 ﻿using Geone.DataService.Core;
+using Geone.DataService.Core.Aggregate;
 using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.REST;
@@ -17,16 +18,23 @@ namespace Geone.DataService.Controllers
         private readonly ILogger<ServiceController> _logger;
         private readonly DBaaSExcutor _dbaasExcutor;
         private readonly MetaRepository _repository;
-        private readonly SoapEx _soapExcutor;
+        private readonly SoapExcutor _soapExcutor;
         private readonly RestExcutor _restExcutor;
+        private readonly AggregateExcutor _aggregateExcutor;
 
 
-        public ServiceController(MetaRepository repository, DBaaSExcutor dbaasExcutor, SoapEx soapExcutor, RestExcutor restExcutor,ILogger<ServiceController> logger)
+        public ServiceController(MetaRepository repository, 
+            DBaaSExcutor dbaasExcutor, 
+            SoapExcutor soapExcutor, 
+            RestExcutor restExcutor,
+            AggregateExcutor aggregateExcutor,
+            ILogger<ServiceController> logger)
         {
             _repository = repository;
             _dbaasExcutor = dbaasExcutor;
             _soapExcutor = soapExcutor;
             _restExcutor = restExcutor;
+            _aggregateExcutor = aggregateExcutor;
             _logger = logger;
         }
 
@@ -41,14 +49,12 @@ namespace Geone.DataService.Controllers
             {
                 case ServiceType.REST:
                    return _restExcutor.Excute(serviceMeta, arguments);
-
                 case ServiceType.SOAP:
-                    throw new NotImplementedException();
-                    //return _soapExcutor.Excute(serviceMeta, arguments) ;
+                    return _soapExcutor.Excute(serviceMeta, arguments) ;
                 case ServiceType.DBaaS:
                     return _dbaasExcutor.Excute(serviceMeta, arguments);
                 case ServiceType.Aggregate:
-                    throw new NotImplementedException();
+                    return _aggregateExcutor.Excute(serviceMeta, arguments);
                 default:
                     throw new NotSupportedException();
             }

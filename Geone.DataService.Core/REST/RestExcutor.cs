@@ -1,17 +1,21 @@
 ﻿using Geone.CADLib.CLI.cURL;
-using Geone.DataService.Core.DBaaS;
-using Geone.DataService.Core.Repository;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
-
+using System.Web;
 
 namespace Geone.DataService.Core.REST
 {
     public class RestExcutor
     {
+        public RestExcutor()
+        {
+
+        }
         public string Excute(ServiceMeta service, Dictionary<string, object> arguments)
         {
             if (service.Type != ServiceType.REST)
@@ -19,35 +23,60 @@ namespace Geone.DataService.Core.REST
 
             JObject jobj = service.Content as JObject;
             if (jobj == null)
-                throw new ArgumentException($"服务内容不是合法的{nameof(RestCommandMeta)}对象");
+                throw new ArgumentException($"服务内容不是合法的{nameof(RestMeta)}对象");
 
-            RestCommandMeta cmd;
+            RestMeta restMeta;
             try
             {
-                cmd = jobj.ToObject<RestCommandMeta>();
+                restMeta = jobj.ToObject<RestMeta>();
             }
             catch (Exception e)
             {
-                throw new ArgumentException($"服务内容不是合法的{nameof(RestCommandMeta)}对象", e);
+                throw new ArgumentException($"服务内容不是合法的{nameof(RestMeta)}对象", e);
             }
 
-            if (string.IsNullOrWhiteSpace(cmd.Curl))
+            if (string.IsNullOrWhiteSpace(restMeta.Curl))
             {
-                throw new ArgumentException($"服务内容不是合法的{nameof(RestCommandMeta)}对象");
+                throw new ArgumentException($"服务内容不是合法的{nameof(RestMeta)}对象");
             }
 
-            cmd.Parameters.AddRange(service.Parameters);
-            foreach (var pitem in cmd.Parameters)
+            restMeta.Parameters.AddRange(service.Parameters);
+            foreach (var pitem in restMeta.Parameters)
             {
                 string valString = null;
                 if (arguments.TryGetValue(pitem.Name, out object val))
                 {
                     pitem.Name = "{" + pitem.Name + "}";
                     valString = Convert.ToString(val);
-                    cmd.Curl = cmd.Curl.Replace(pitem.Name, valString);
+                    restMeta.Curl = restMeta.Curl.Replace(pitem.Name, valString);
                 }
             }
-            HttpRequestMessage httpRequest = CURLParser.CreateHttpRequest(cmd.Curl);
+
+            HttpRequestMessage httpRequest = CURLParser.CreateHttpRequest(restMeta.Curl);
+            if (httpRequest.Content != null)
+            {
+                string fdata = httpRequest.Content.ReadAsStringAsync().Result;
+                string[] fdataItems = fdata.Split('&');
+                MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent();
+                foreach (var item in fdataItems)
+                {
+                    string data = HttpUtility.UrlDecode(item);
+                    if (data.Contains('@'))
+                    {
+                        string[] fileNameAndPath = data.Split(';')[0].Split('=');
+                        string filePath = fileNameAndPath[1].Replace("@", "");
+                        string fileName = Path.GetFileName(filePath);
+                        multipartFormDataContent.Add(new StreamContent(File.OpenRead(filePath)), fileNameAndPath[0], fileName);
+                    }
+                    else
+                    {
+                        multipartFormDataContent.Add(new StringContent(data, Encoding.UTF8, "text/plain"));
+                    }
+                }
+
+                httpRequest.Content = multipartFormDataContent;
+            }
+
             using (HttpClient client = new HttpClient())
             {
                 HttpResponseMessage response = client.SendAsync(httpRequest, HttpCompletionOption.ResponseContentRead).Result;
@@ -58,8 +87,7 @@ namespace Geone.DataService.Core.REST
                 else
                 {
                     response.EnsureSuccessStatusCode();
-                    string responseBodyAsText = response.Content.ReadAsStringAsync().Result;
-                    return responseBodyAsText;
+                    return response.Content.ReadAsStringAsync().Result;
                 }
             }
         }
