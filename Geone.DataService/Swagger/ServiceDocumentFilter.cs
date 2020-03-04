@@ -1,14 +1,8 @@
-﻿using Geone.DataService.Core;
+﻿using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Models;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Geone.DataService.Swagger
 {
@@ -37,10 +31,9 @@ namespace Geone.DataService.Swagger
             var services = _repository.Query(x => x.MetaType == MetaType.Service);
             foreach (var svcEntity in services)
             {
-                ServiceMeta svcMeta = svcEntity.Deserialize<ServiceMeta>();
+                ServiceMeta svcMeta = svcEntity.GetMetadata() as ServiceMeta;
 
                 OpenApiPathItem pathItem = new OpenApiPathItem();
-                pathItem.Summary = svcMeta.Summary;
                 pathItem.Description = svcMeta.Description;
 
                 OpenApiOperation operation = new OpenApiOperation();
@@ -56,54 +49,8 @@ namespace Geone.DataService.Swagger
                 mediaType.Schema = new OpenApiSchema();
                 mediaType.Schema.Type = "object";
 
-
-                mediaType.Example = new OpenApiRawString(CreateArgumentExample(svcMeta));
+                mediaType.Example = new OpenApiRawString(svcMeta.ParamsExample?.ToString());
                 swaggerDoc.Paths.Add($"/service/{svcEntity.Name}", pathItem);
-            }
-        }
-
-        string CreateArgumentExample(ServiceMeta svcMeta)
-        {
-            switch (svcMeta.Type)
-            {
-                case ServiceType.REST:
-                    return null;
-                case ServiceType.SOAP:
-                    return "{\"Add\": {\"@xmlns\":\"http://tempuri.org/\", \"intA\" : 1,  \"intB\" : 2}}";
-                case ServiceType.DBaaS:
-                    Dictionary<string, object> dbExample = new Dictionary<string, object>();
-                    foreach (var paramItem in svcMeta.Parameters)
-                    {
-                        dbExample.Add(paramItem.Name, GetDefaultValue(paramItem));
-                    }
-                    return JsonConvert.SerializeObject(dbExample, Formatting.Indented);
-                case ServiceType.Aggregate:
-                    return null;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        object GetDefaultValue(Parameter paramItem)
-        {
-            switch (paramItem.Type)
-            {
-                case DataType.String:
-                    return paramItem.Value == null ? "name" : paramItem.Value.ToString();
-                case DataType.Boolean:
-                    bool.TryParse(Convert.ToString(paramItem.Value), out bool boolVal);
-                    return paramItem.Value == null ? false : boolVal;
-                case DataType.Datetime:
-                    DateTime.TryParse(Convert.ToString(paramItem.Value), out DateTime dateVal);
-                    return paramItem.Value == null ? DateTime.UtcNow : dateVal;
-                case DataType.Int:
-                    int.TryParse(Convert.ToString(paramItem.Value), out int intVal);
-                    return paramItem.Value == null ? 0 : intVal;
-                case DataType.Double:
-                    double.TryParse(Convert.ToString(paramItem.Value), out double doubleVal);
-                    return paramItem.Value == null ? 0 : doubleVal;
-                default:
-                    throw new NotSupportedException();
             }
         }
     }

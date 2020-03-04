@@ -1,25 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Geone.DataService.Config;
 using Geone.DataService.Core;
-using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.SOAP;
+using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.SOAP;
 using Geone.DataService.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
-using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Geone.DataService
 {
@@ -34,20 +27,19 @@ namespace Geone.DataService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(ConfigRoot.Read("appsettings.json"));
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
             services.AddSingleton<SoapExcutor>();
-
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Data Service Web API", Version = "v1" });
                 options.DocumentFilter<ServiceDocumentFilter>();
                 options.EnableAnnotations();
             });
-
-            services.AddControllers();
-            services.AddMvc();
+            services.AddSwaggerGenNewtonsoftSupport();
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -69,6 +61,7 @@ namespace Geone.DataService
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

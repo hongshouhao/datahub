@@ -1,9 +1,10 @@
-﻿using Geone.DataService.Core.Repository;
+﻿using Geone.DataService.Core.Metadata;
+using Geone.DataService.Core.Repository;
 using System;
 using System.Data.Common;
 using System.Text;
 
-namespace Geone.DataService.Core.DBaaS
+namespace Geone.DataService.Core.Service.DBaaS
 {
     public class DbCommandExcutor
     {
@@ -16,7 +17,7 @@ namespace Geone.DataService.Core.DBaaS
         public string Excute(DbCommandMeta dbCommand)
         {
             MetaEntity entity = _repository.Get(MetaType.Db, dbCommand.Database);
-            DbMeta dbMeta = entity.Deserialize<DbMeta>();
+            DbMeta dbMeta = entity.GetMetadata() as DbMeta;
 
             DbProviderFactory provider = DbFactories.Get(dbMeta.Type);
             using (DbConnection connection = provider.CreateConnection())
@@ -30,10 +31,10 @@ namespace Geone.DataService.Core.DBaaS
                     command.Connection = connection;
                     command.Transaction = trans;
 
-                    foreach (Parameter pitem in dbCommand.Parameters)
+                    foreach (var pitem in dbCommand.Parameters)
                     {
                         DbParameter parameter = command.CreateParameter();
-                        parameter.ParameterName = pitem.Name;
+                        parameter.ParameterName = pitem.Key;
                         parameter.Value = pitem.Value;
 
                         command.Parameters.Add(parameter);

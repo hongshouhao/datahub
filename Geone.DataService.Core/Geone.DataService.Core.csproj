@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SOAP\EMethod.cs" />
-    <Compile Remove="SOAP\HttpHelper.cs" />
-    <Compile Remove="SOAP\HttpHelper2.cs" />
-    <Compile Remove="SOAP\MainWindow.xaml.cs" />
+    <Compile Remove="Service\SOAP\EMethod.cs" />
+    <Compile Remove="Service\SOAP\HttpHelper.cs" />
+    <Compile Remove="Service\SOAP\HttpHelper2.cs" />
+    <Compile Remove="Service\SOAP\MainWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,13 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Aggregate\" />
+    <Folder Include="Service\Aggregate\" />
     <Folder Include="Connected Services\" />
-    <Folder Include="REST\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\System.Web.Services\System.Web.Services.csproj" />
+    <Folder Include="Service\REST\" />
   </ItemGroup>
 
   <ItemGroup>

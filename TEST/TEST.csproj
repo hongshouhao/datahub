@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Geone.DataService.Core\Geone.DataService.Core.csproj" />
-    <ProjectReference Include="..\Geone.XmlSampleGenerator\Geone.XmlSampleGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

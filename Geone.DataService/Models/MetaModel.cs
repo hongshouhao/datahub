@@ -1,6 +1,4 @@
-﻿using Geone.DataService.Core;
-using Geone.DataService.Core.DBaaS;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataService.Core.Repository;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,7 +19,7 @@ namespace Geone.DataService.Models
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
 
-        public static MetaModel From<TMeta>(MetaEntity metaEntity) where TMeta : IMeta
+        public static MetaModel From(MetaEntity metaEntity)
         {
             MetaModel model = new MetaModel();
             model.Id = metaEntity.Id;
@@ -29,30 +27,7 @@ namespace Geone.DataService.Models
             model.MetaType = metaEntity.MetaType;
             model.CreatedDate = metaEntity.CreatedDate;
             model.ModifiedDate = metaEntity.ModifiedDate;
-
-            if (!string.IsNullOrWhiteSpace(metaEntity.Metadata))
-            {
-                TMeta tmeta = JsonConvert.DeserializeObject<TMeta>(metaEntity.Metadata);
-                if (tmeta is ServiceMeta serviceMeta)
-                {
-                    switch (serviceMeta.Type)
-                    {
-                        case ServiceType.REST:
-                            break;
-                        case ServiceType.SOAP:
-                            break;
-                        case ServiceType.DBaaS:
-                            serviceMeta.Content = ((JObject)serviceMeta.Content).ToObject<DbCommandMeta>();
-                            break;
-                        case ServiceType.Aggregate:
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                model.Metadata = tmeta;
-            }
-
+            model.Metadata = metaEntity.GetMetadata();
             return model;
         }
 
@@ -66,9 +41,14 @@ namespace Geone.DataService.Models
             metaEntity.CreatedDate = this.CreatedDate;
             metaEntity.ModifiedDate = this.ModifiedDate;
 
-            if (this.Metadata != null)
+            if (this.Metadata is JObject
+                || this.Metadata is string)
             {
-                metaEntity.Metadata = this.Metadata.ToString();
+                metaEntity.Metadata = this.Metadata?.ToString();
+            }
+            else
+            {
+                metaEntity.Metadata = JsonConvert.SerializeObject(this.Metadata);
             }
 
             return metaEntity;

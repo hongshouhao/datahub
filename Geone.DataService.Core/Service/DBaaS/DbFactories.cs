@@ -1,10 +1,11 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Geone.DataService.Core.Metadata;
+using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace Geone.DataService.Core.DBaaS
+namespace Geone.DataService.Core.Service.DBaaS
 {
     public class DbFactories
     {

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Geone.DataService.Core.Metadata;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoapHttpClient;
 using SoapHttpClient.Enums;
@@ -6,7 +7,7 @@ using System;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Geone.DataService.Core.SOAP
+namespace Geone.DataService.Core.Service.SOAP
 {
     public class SoapExcutor
     {
@@ -19,17 +20,7 @@ namespace Geone.DataService.Core.SOAP
             if (service.Type != ServiceType.SOAP)
                 throw new ArgumentException("服务类型不匹配");
 
-            JObject jmeta = service.Content as JObject;
-            SoapMeta soapMeta;
-            try
-            {
-                soapMeta = jmeta.ToObject<SoapMeta>();
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException($"服务内容不是合法的{nameof(SoapMeta)}对象", e);
-            }
-
+            SoapMeta soapMeta = (SoapMeta)service.Content;
             if (string.IsNullOrWhiteSpace(soapMeta.Uri))
             {
                 throw new ArgumentException($"服务内容不是合法的{nameof(SoapMeta)}对象");

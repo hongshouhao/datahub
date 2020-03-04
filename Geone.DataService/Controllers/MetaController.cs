@@ -1,5 +1,4 @@
-﻿using Geone.DataService.Core;
-using Geone.DataService.Core.DBaaS;
+﻿using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Models;
 using Geone.DataService.Swagger;
@@ -7,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceStack.OrmLite;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Geone.DataService.Controllers
 {
@@ -30,15 +29,8 @@ namespace Geone.DataService.Controllers
         [Route("{metaType}/{name}")]
         public MetaModel Get(MetaType metaType, string name)
         {
-            switch (metaType)
-            {
-                case MetaType.Db:
-                    return MetaModel.From<DbMeta>(_repository.Get(metaType, name));
-                case MetaType.Service:
-                    return MetaModel.From<ServiceMeta>(_repository.Get(metaType, name));
-                default:
-                    throw new NotSupportedException();
-            }
+            MetaEntity entity = _repository.Get(metaType, name);
+            return MetaModel.From(entity);
         }
 
         [HttpGet]
@@ -46,15 +38,7 @@ namespace Geone.DataService.Controllers
         public MetaModel[] GetAll(MetaType metaType)
         {
             List<MetaEntity> list = _repository.Query(x => x.MetaType == metaType);
-            switch (metaType)
-            {
-                case MetaType.Db:
-                    return list.Select(e => MetaModel.From<DbMeta>(e)).ToArray();
-                case MetaType.Service:
-                    return list.Select(e => MetaModel.From<ServiceMeta>(e)).ToArray();
-                default:
-                    throw new NotSupportedException();
-            }
+            return list.Select(e => MetaModel.From(e)).ToArray();
         }
 
         [HttpDelete]
@@ -68,14 +52,18 @@ namespace Geone.DataService.Controllers
         [SwaggerOperationFilter(typeof(MetaSaveOperationFilter))]
         public void Post(MetaModel meta)
         {
-            _repository.Insert(meta.ToEntity());
+            var entity = meta.ToEntity();
+            entity.GetMetadata().CheckValid();
+            _repository.Insert(entity);
         }
 
         [HttpPut]
         [SwaggerOperationFilter(typeof(MetaSaveOperationFilter))]
         public void Put(MetaModel meta)
         {
-            _repository.Update(meta.ToEntity());
+            var entity = meta.ToEntity();
+            entity.GetMetadata().CheckValid();
+            _repository.Update(entity);
         }
     }
 }

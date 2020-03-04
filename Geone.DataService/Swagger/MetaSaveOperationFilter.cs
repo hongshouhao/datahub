@@ -1,13 +1,12 @@
-﻿using Geone.DataService.Core;
-using Geone.DataService.Core.DBaaS;
+﻿using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.SOAP;
+using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.SOAP;
 using Geone.DataService.Models;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Collections.Generic;
 
 namespace Geone.DataService.Swagger
 {
@@ -18,6 +17,7 @@ namespace Geone.DataService.Swagger
             AddDbMeta(operation);
             AddDBaaSMeta(operation);
             AddSoapMeta(operation);
+            AddServiceTestMeta(operation);
         }
 
         private static void AddDbMeta(OpenApiOperation operation)
@@ -33,7 +33,8 @@ namespace Geone.DataService.Swagger
                 ConnectionString = "Data Source=服务器名;Initial Catalog=数据库名; User Id=用户名;Password=密码",
                 Type = DbTypes.MsSql
             };
-            AddExample(operation, model, MetaType.Db.ToString());
+
+            AddSwaggerExample(operation, model, MetaType.Db.ToString());
         }
 
         private static void AddDBaaSMeta(OpenApiOperation operation)
@@ -47,7 +48,7 @@ namespace Geone.DataService.Swagger
 
             ServiceMeta service = new ServiceMeta();
             service.Type = ServiceType.DBaaS;
-            service.Parameters.Add(new Parameter() { Name = "a", Value = "val", Type = DataType.String });
+            service.ParamsExample = new { a = "val" };
             service.Content = new DbCommandMeta()
             {
                 CommandText = "select * from table where a = @a",
@@ -55,30 +56,50 @@ namespace Geone.DataService.Swagger
                 Database = "database"
             };
             model.Metadata = service;
-            AddExample(operation, model, ServiceType.DBaaS.ToString());
+
+            AddSwaggerExample(operation, model, ServiceType.DBaaS.ToString());
         }
 
         private static void AddSoapMeta(OpenApiOperation operation)
         {
             MetaModel model = new MetaModel();
             model.Id = 0;
-            model.Name = "soap";
+            model.Name = Samples.Soap.ServiceName;
             model.MetaType = MetaType.Service;
             model.CreatedDate = DateTime.UtcNow;
             model.ModifiedDate = DateTime.UtcNow;
 
             ServiceMeta service = new ServiceMeta();
             service.Type = ServiceType.SOAP;
-            service.Parameters = null;
+
+            service.ParamsExample = Samples.Soap.Parameters;
+
             service.Content = new SoapMeta()
             {
-                Uri = "http://www.dneonline.com/calculator.asmx"
+                Uri = Samples.Soap.Uri
             };
             model.Metadata = service;
-            AddExample(operation, model, ServiceType.SOAP.ToString());
+
+            AddSwaggerExample(operation, model, ServiceType.SOAP.ToString());
         }
 
-        private static void AddExample(OpenApiOperation operation, MetaModel model, string key)
+        private static void AddServiceTestMeta(OpenApiOperation operation)
+        {
+            MetaModel model = new MetaModel();
+            model.Id = 0;
+            model.Name = "soap_add_test";
+            model.MetaType = MetaType.ServiceTest;
+            model.CreatedDate = DateTime.UtcNow;
+            model.ModifiedDate = DateTime.UtcNow;
+
+            ServiceTestMeta test = new ServiceTestMeta();
+            test.ServiceName = Samples.Soap.ServiceName;
+            test.Body = Samples.Soap.Parameters;
+            model.Metadata = test;
+            AddSwaggerExample(operation, model, MetaType.ServiceTest.ToString());
+        }
+
+        private static void AddSwaggerExample(OpenApiOperation operation, MetaModel model, string key)
         {
             OpenApiExample example = new OpenApiExample();
             example.Value = new OpenApiRawString(JsonConvert.SerializeObject(model));
