@@ -1,6 +1,7 @@
 ﻿using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.REST;
 using Geone.DataService.Core.Service.SOAP;
 using Geone.DataService.Models;
 using Microsoft.OpenApi.Models;
@@ -17,6 +18,7 @@ namespace Geone.DataService.Swagger
             AddDbMeta(operation);
             AddDBaaSMeta(operation);
             AddSoapMeta(operation);
+            AddRestMeta(operation);
             AddServiceTestMeta(operation);
         }
 
@@ -81,6 +83,48 @@ namespace Geone.DataService.Swagger
             model.Metadata = service;
 
             AddSwaggerExample(operation, model, ServiceType.SOAP.ToString());
+        }
+
+        private static void AddRestMeta(OpenApiOperation operation)
+        {
+            MetaModel model = new MetaModel();
+            model.Id = 0;
+            model.Name = "rest";
+            model.MetaType = MetaType.Service;
+            model.CreatedDate = DateTime.UtcNow;
+            model.ModifiedDate = DateTime.UtcNow;
+
+            ServiceMeta service = new ServiceMeta();
+            service.Type = ServiceType.REST;
+            service.Content = new RestMeta()
+            {
+                CURL = "curl -X GET \"http://jsonplaceholder.typicode.com/posts\""
+            };
+            model.Metadata = service;
+            AddSwaggerExample(operation, model, ServiceType.REST.ToString());
+        }
+
+        private static void AddAggregateMeta(OpenApiOperation operation)
+        {
+            //MetaModel model = new MetaModel();
+            //model.Id = 0;
+            //model.Name = "aggregate";
+            //model.MetaType = MetaType.Service;
+            //model.CreatedDate = DateTime.UtcNow;
+            //model.ModifiedDate = DateTime.UtcNow;
+
+            //ServiceMeta service = new ServiceMeta();
+            //service.Type = ServiceType.Aggregate;
+
+            //service.Parameters.Add(new Parameter() { Name = "reprojectKey", Value = "my", Type = DataType.String });
+            //service.Parameters.Add(new Parameter() { Name = "Add", Value = "{\"Add\": {\"@xmlns\":\"http://tempuri.org/\", \"intA\" : 1,  \"intB\" : 2}}", Type = DataType.String });
+
+            //service.Content = new AggregateMeta()
+            //{
+            //    AggregateJson = "{\"A\":\"REST$(reprojectKey)\",\"B\":\"soap$(Add)\"}"
+            //};
+            //model.Metadata = service;
+            //AddExample(operation, model, ServiceType.Aggregate.ToString());
         }
 
         private static void AddServiceTestMeta(OpenApiOperation operation)

@@ -19,12 +19,7 @@ namespace Geone.DataService.Core.Service.DBaaS
                 throw new ArgumentException("服务类型不匹配");
 
             DbCommandMeta cmd = (DbCommandMeta)service.Content;
-
-            if (string.IsNullOrWhiteSpace(cmd.Database)
-                || string.IsNullOrWhiteSpace(cmd.CommandText))
-            {
-                throw new ArgumentException($"服务内容不是合法的{nameof(DbCommandMeta)}对象");
-            }
+            cmd.CheckValid();
 
             if (arguments != null)
             {

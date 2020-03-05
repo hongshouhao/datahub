@@ -1,5 +1,7 @@
 ﻿using Geone.DataService.Core.Service;
+using Geone.DataService.Core.Service.Aggregate;
 using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.REST;
 using Geone.DataService.Core.Service.SOAP;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -35,6 +37,11 @@ namespace Geone.DataService.Core.Metadata
             switch (Type)
             {
                 case ServiceType.REST:
+                    if (Content is JObject jrest)
+                    {
+                        Content = jrest.ToObject<RestMeta>();
+                    }
+                    break;
                 case ServiceType.SOAP:
                     if (Content is JObject jsoap)
                     {
@@ -48,7 +55,11 @@ namespace Geone.DataService.Core.Metadata
                     }
                     break;
                 case ServiceType.Aggregate:
-                    throw new NotSupportedException();
+                    if (Content is JObject jagg)
+                    {
+                        Content = jagg.ToObject<AggregateMeta>();
+                    }
+                    break;
                 default:
                     throw new NotSupportedException();
             }

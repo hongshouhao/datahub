@@ -2,6 +2,7 @@
 using Geone.DataService.Config;
 using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.Service;
 using Geone.DataService.Core.Service.DBaaS;
 using Geone.DataService.Core.Service.SOAP;
 using Microsoft.AspNetCore.Mvc;
@@ -18,21 +19,18 @@ namespace Geone.DataService.Controllers
     {
         private readonly ConfigRoot _configRoot;
         private readonly MetaRepository _repository;
-        private readonly DBaaSExcutor _dbaasExcutor;
-        private readonly SoapExcutor _soapExcutor;
+        private readonly ServiceExcutor _excutor;
         private readonly ILogger<ServiceController> _logger;
 
         public ServiceController(
             ConfigRoot configRoot,
             MetaRepository repository,
-            DBaaSExcutor dbaasExcutor,
-            SoapExcutor soapExcutor,
+            ServiceExcutor excutor,
             ILogger<ServiceController> logger)
         {
             _configRoot = configRoot;
             _repository = repository;
-            _dbaasExcutor = dbaasExcutor;
-            _soapExcutor = soapExcutor;
+            _excutor = excutor;
             _logger = logger;
         }
 
@@ -42,20 +40,7 @@ namespace Geone.DataService.Controllers
         {
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.GetMetadata() as ServiceMeta;
-
-            switch (serviceMeta.Type)
-            {
-                case ServiceType.REST:
-                    throw new NotImplementedException();
-                case ServiceType.SOAP:
-                    return _soapExcutor.Excute(serviceMeta, arguments);
-                case ServiceType.DBaaS:
-                    return _dbaasExcutor.Excute(serviceMeta, arguments);
-                case ServiceType.Aggregate:
-                    throw new NotImplementedException();
-                default:
-                    throw new NotSupportedException();
-            }
+            return _excutor.Excute(serviceMeta, arguments);
         }
 
         [HttpPost]

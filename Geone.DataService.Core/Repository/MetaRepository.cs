@@ -33,7 +33,7 @@ namespace Geone.DataService.Core.Repository
                 MetaEntity entity = db.Single<MetaEntity>(x => x.Name == name && x.MetaType == metaType);
                 if (entity == null && throwIfNotFound)
                 {
-                    throw new Exception($"不存在名为[{name}]类型为[{metaType}]的对象");
+                    throw new BizException($"不存在元数据: 类型={metaType}, 标识={name}");
                 }
 
                 return entity;
@@ -65,7 +65,7 @@ namespace Geone.DataService.Core.Repository
         {
             if (Get(metaEntity.MetaType, metaEntity.Name, false) != null)
             {
-                throw new BizException(metaEntity.MetaType, metaEntity.Name);
+                throw new BizException($"已存在元数据: 类型={metaEntity.MetaType}, 标识={metaEntity.Name}");
             }
 
             using (var db = _dbFactory.Open())
@@ -92,7 +92,7 @@ namespace Geone.DataService.Core.Repository
                 MetaEntity serviceEntity = db.Single<MetaEntity>(x => x.Name == serviceTestMeta.ServiceName && x.MetaType == MetaType.Service);
                 if (serviceEntity == null)
                 {
-                    throw new Exception($"不存在名为{serviceTestMeta.ServiceName}的服务");
+                    throw new BizException($"不存在名为{serviceTestMeta.ServiceName}的服务");
                 }
             }
         }

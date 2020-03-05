@@ -1,7 +1,9 @@
 using Geone.DataService.Config;
 using Geone.DataService.Core;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.Service.Aggregate;
 using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.REST;
 using Geone.DataService.Core.Service.SOAP;
 using Geone.DataService.Swagger;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +34,9 @@ namespace Geone.DataService
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
             services.AddSingleton<SoapExcutor>();
+            services.AddSingleton<RestExcutor>();
+            services.AddSingleton<AggregateExcutor>();
+
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Data Service Web API", Version = "v1" });

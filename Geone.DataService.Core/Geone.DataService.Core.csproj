@@ -5,13 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Service\SOAP\EMethod.cs" />
-    <Compile Remove="Service\SOAP\HttpHelper.cs" />
-    <Compile Remove="Service\SOAP\HttpHelper2.cs" />
-    <Compile Remove="Service\SOAP\MainWindow.xaml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.1" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -20,20 +13,5 @@
     <PackageReference Include="SoapHttpClient" Version="3.0.0" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
-    <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.Http" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.Security" Version="4.4.*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Service\Aggregate\" />
-    <Folder Include="Connected Services\" />
-    <Folder Include="Service\REST\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services" />
-  </ItemGroup>
-
 </Project>

@@ -1,16 +1,13 @@
 ﻿using Geone.DataService.Core.Repository;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Geone.DataService.Core.Exceptions
 {
     public class BizException : Exception
     {
-        public BizException(MetaType metaType, string name)
-            : base($"已存在元数据: 类型={metaType}, 标识={name}")
+        public BizException(string message)
+            : base(message)
         {
-
         }
     }
 }

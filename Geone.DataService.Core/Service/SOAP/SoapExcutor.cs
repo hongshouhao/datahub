@@ -21,21 +21,18 @@ namespace Geone.DataService.Core.Service.SOAP
                 throw new ArgumentException("服务类型不匹配");
 
             SoapMeta soapMeta = (SoapMeta)service.Content;
-            if (string.IsNullOrWhiteSpace(soapMeta.Uri))
-            {
-                throw new ArgumentException($"服务内容不是合法的{nameof(SoapMeta)}对象");
-            }
+            soapMeta.CheckValid();
 
-            XmlDocument xdoc = null;
+            XDocument xdoc = null;
             if (arguments != null)
             {
-                xdoc = JsonConvert.DeserializeXmlNode(arguments.ToString());
+                xdoc = JsonConvert.DeserializeXNode(arguments.ToString());
             }
 
             XElement xele = null;
             if (xdoc != null)
             {
-                xele = XElement.Load(new XmlNodeReader(xdoc));
+                xele = xdoc.Root;
             }
 
             var soapClient = new SoapClient();
