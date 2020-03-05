@@ -4,6 +4,9 @@ using ServiceStack.OrmLite;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Linq;
+using Geone.DataService.Core.Metadata;
+using System.Data;
 
 namespace Geone.DataService.Core.Repository
 {
@@ -19,7 +22,7 @@ namespace Geone.DataService.Core.Repository
         {
             using (var db = _dbFactory.Open())
             {
-                return db.Select<MetaEntity>(predicate);
+                return db.Select(predicate);
             }
         }
 
@@ -27,7 +30,13 @@ namespace Geone.DataService.Core.Repository
         {
             using (var db = _dbFactory.Open())
             {
-                return db.Single<MetaEntity>(x => x.Name == name && x.MetaType == metaType);
+                MetaEntity entity = db.Single<MetaEntity>(x => x.Name == name && x.MetaType == metaType);
+                if (entity == null && throwIfNotFound)
+                {
+                    throw new BizException($"不存在元数据: 类型={metaType}, 标识={name}");
+                }
+
+                return entity;
             }
         }
 
@@ -35,29 +44,56 @@ namespace Geone.DataService.Core.Repository
         {
             using (var db = _dbFactory.Open())
             {
-                //db.Delete(new MetaEntity { MetaType = metaType, Name = name });
+                using (var trans = db.OpenTransaction())
+                {
+                    db.Delete<MetaEntity>(x => x.MetaType == metaType && x.Name == name);
+                    if (metaType == MetaType.Service)
+                    {
+                        var todelete = db.Select((Expression<Func<MetaEntity, bool>>)(x => x.MetaType == MetaType.ServiceTest))
+                              .Where(x => (x.GetMetadata() as ServiceTestMeta).ServiceName.ToLower() == name.ToLower())
+                              .ToArray();
 
-                db.Delete<MetaEntity>("MetaType = @mt and Name = @n", new { mt = metaType, n = name });
+                        db.DeleteAll(todelete);
+                    }
+
+                    trans.Commit();
+                }
             }
         }
 
         public void Insert(MetaEntity metaEntity)
         {
+            if (Get(metaEntity.MetaType, metaEntity.Name, false) != null)
+            {
+                throw new BizException($"已存在元数据: 类型={metaEntity.MetaType}, 标识={metaEntity.Name}");
+            }
+
             using (var db = _dbFactory.Open())
             {
-                if (Get(metaEntity.MetaType, metaEntity.Name) != null)
-                {
-                    throw new MetaAlreadyexistException(metaEntity.MetaType, metaEntity.Name);
-                }
+                CheckServiceExistForTest(metaEntity, db);
                 db.Insert(metaEntity);
             }
         }
 
-        public void Update(MetaEntity entity)
+        public void Update(MetaEntity metaEntity)
         {
             using (var db = _dbFactory.Open())
             {
-                db.Update(entity);
+                CheckServiceExistForTest(metaEntity, db);
+                db.Update(metaEntity);
+            }
+        }
+
+        private static void CheckServiceExistForTest(MetaEntity metaEntity, IDbConnection db)
+        {
+            if (metaEntity.MetaType == MetaType.ServiceTest)
+            {
+                ServiceTestMeta serviceTestMeta = metaEntity.GetMetadata() as ServiceTestMeta;
+                MetaEntity serviceEntity = db.Single<MetaEntity>(x => x.Name == serviceTestMeta.ServiceName && x.MetaType == MetaType.Service);
+                if (serviceEntity == null)
+                {
+                    throw new BizException($"不存在名为{serviceTestMeta.ServiceName}的服务");
+                }
             }
         }
     }

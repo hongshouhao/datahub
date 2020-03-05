@@ -1,9 +1,10 @@
+using Geone.DataService.Config;
 using Geone.DataService.Core;
-using Geone.DataService.Core.Aggregate;
-using Geone.DataService.Core.DBaaS;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.REST;
-using Geone.DataService.Core.SOAP;
+using Geone.DataService.Core.Service.Aggregate;
+using Geone.DataService.Core.Service.DBaaS;
+using Geone.DataService.Core.Service.REST;
+using Geone.DataService.Core.Service.SOAP;
 using Geone.DataService.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 
@@ -27,6 +29,7 @@ namespace Geone.DataService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(ConfigRoot.Read("appsettings.json"));
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
@@ -40,9 +43,8 @@ namespace Geone.DataService
                 options.DocumentFilter<ServiceDocumentFilter>();
                 options.EnableAnnotations();
             });
-
-            services.AddControllers();
-            services.AddMvc();
+            services.AddSwaggerGenNewtonsoftSupport();
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -64,6 +66,7 @@ namespace Geone.DataService
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

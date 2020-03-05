@@ -1,5 +1,5 @@
-﻿using Geone.DataService.Core.DBaaS;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.Service.DBaaS;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using System;
