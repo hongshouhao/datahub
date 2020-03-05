@@ -54,7 +54,7 @@ namespace Geone.DataService.Controllers
                 case ServiceType.DBaaS:
                     return _dbaasExcutor.Excute(serviceMeta, arguments);
                 case ServiceType.Aggregate:
-                    return _aggregateExcutor.Excute(serviceMeta, arguments);
+                    return _aggregateExcutor.Excute(serviceMeta, arguments).Result;
                 default:
                     throw new NotSupportedException();
             }

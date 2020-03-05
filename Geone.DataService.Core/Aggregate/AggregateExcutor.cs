@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geone.DataService.Core.Aggregate
 {
@@ -29,7 +30,7 @@ namespace Geone.DataService.Core.Aggregate
             _restExcutor = restExcutor;
         }
 
-        public string Excute(ServiceMeta service, Dictionary<string, object> arguments)
+        public async Task<string> Excute(ServiceMeta service, Dictionary<string, object> arguments)
         {
             if (service.Type != ServiceType.Aggregate)
                 throw new ArgumentException("服务类型不匹配");
@@ -52,45 +53,49 @@ namespace Geone.DataService.Core.Aggregate
 
             string returnJson = aggregateMeta.AggregateJson;
             JObject jAggregate = JObject.Parse(aggregateMeta.AggregateJson);
+
             foreach (var item in jAggregate)
             {
-                string key = item.Key;
-                JToken jtoken = item.Value;
-
-                string value = jtoken.ToString();
-                string[] serviceAndparams = value.Split("$");
-
-                string serviceName = serviceAndparams[0];
-                Dictionary<string, object> dicArguments = new Dictionary<string, object>();
-                if (serviceAndparams.Length == 2)
+                await Task.Run(() =>
                 {
-                    string paramString = serviceAndparams[1];
-                    foreach (var param in paramString.Trim('(', ')').Split(','))
+                    string key = item.Key;
+                    JToken jtoken = item.Value;
+
+                    string value = jtoken.ToString();
+                    string[] serviceAndparams = value.Split("$");
+
+                    string serviceName = serviceAndparams[0];
+                    Dictionary<string, object> dicArguments = new Dictionary<string, object>();
+                    if (serviceAndparams.Length == 2)
                     {
-                        if (arguments.TryGetValue(param, out object paramValue))
+                        string paramString = serviceAndparams[1];
+                        foreach (var param in paramString.Trim('(', ')').Split(','))
                         {
-                            dicArguments.Add(param, paramValue);
+                            if (arguments.TryGetValue(param, out object paramValue))
+                            {
+                                dicArguments.Add(param, paramValue);
+                            }
                         }
                     }
-                }
 
-                MetaEntity entity = _repository.Get(MetaType.Service, serviceName);
-                ServiceMeta serviceMeta = entity.Deserialize<ServiceMeta>();
-                switch (serviceMeta.Type)
-                {
-                    case ServiceType.REST:
-                        returnJson = returnJson.Replace(value, _restExcutor.Excute(serviceMeta, dicArguments));
-                        break;
-                    case ServiceType.SOAP:
-                        Dictionary<string, object> soapArguments = JsonConvert.DeserializeObject<Dictionary<string, object>>(dicArguments.First().Value.ToString());
-                        returnJson = returnJson.Replace(value, _soapExcutor.Excute(serviceMeta, soapArguments));
-                        break;
-                    case ServiceType.DBaaS:
-                        returnJson = returnJson.Replace(value, _dbaasExcutor.Excute(serviceMeta, dicArguments));
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
+                    MetaEntity entity = _repository.Get(MetaType.Service, serviceName);
+                    ServiceMeta serviceMeta = entity.Deserialize<ServiceMeta>();
+                    switch (serviceMeta.Type)
+                    {
+                        case ServiceType.REST:
+                            returnJson = returnJson.Replace(value, _restExcutor.Excute(serviceMeta, dicArguments));
+                            break;
+                        case ServiceType.SOAP:
+                            Dictionary<string, object> soapArguments = JsonConvert.DeserializeObject<Dictionary<string, object>>(dicArguments.First().Value.ToString());
+                            returnJson = returnJson.Replace(value, _soapExcutor.Excute(serviceMeta, soapArguments));
+                            break;
+                        case ServiceType.DBaaS:
+                            returnJson = returnJson.Replace(value, _dbaasExcutor.Excute(serviceMeta, dicArguments));
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                });
             }
 
             return returnJson;
