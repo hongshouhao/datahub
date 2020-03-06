@@ -14,4 +14,8 @@
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Geone.cURLSharp\Geone.cURLSharp.csproj" />
+  </ItemGroup>
 </Project>

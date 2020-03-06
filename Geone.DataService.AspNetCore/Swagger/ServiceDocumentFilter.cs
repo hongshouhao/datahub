@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
-namespace Geone.DataService.Swagger
+namespace Geone.DataService.AspNetCore.Swagger
 {
     public class ServiceDocumentFilter : IDocumentFilter
     {

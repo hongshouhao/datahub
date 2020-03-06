@@ -1,16 +1,14 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataService.AspNetCore.Models;
+using Geone.DataService.AspNetCore.Swagger;
 using Geone.DataService.Core.Repository;
-using Geone.DataService.Models;
-using Geone.DataService.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceStack.OrmLite;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geone.DataService.Controllers
+namespace Geone.DataService.AspNetCore.Controllers
 {
     [ApiController]
     [Route("meta")]

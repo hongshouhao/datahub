@@ -2,17 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>DataService</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Consul\Consul.csproj" />
+    <ProjectReference Include="..\Geone.DataService.AspNetCore\Geone.DataService.AspNetCore.csproj" />
     <ProjectReference Include="..\Geone.DataService.Core\Geone.DataService.Core.csproj" />
   </ItemGroup>
 

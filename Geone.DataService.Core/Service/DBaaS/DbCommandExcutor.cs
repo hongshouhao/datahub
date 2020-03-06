@@ -14,7 +14,7 @@ namespace Geone.DataService.Core.Service.DBaaS
             _repository = repository;
         }
 
-        public string Excute(DbCommandMeta dbCommand)
+        public object Excute(DbCommandMeta dbCommand)
         {
             MetaEntity entity = _repository.Get(MetaType.Db, dbCommand.Database);
             DbMeta dbMeta = entity.GetMetadata() as DbMeta;
@@ -26,34 +26,41 @@ namespace Geone.DataService.Core.Service.DBaaS
                 connection.Open();
                 using (DbTransaction trans = connection.BeginTransaction())
                 {
-                    DbCommand command = provider.CreateCommand();
-                    command.CommandText = dbCommand.CommandText;
-                    command.Connection = connection;
-                    command.Transaction = trans;
-
-                    foreach (var pitem in dbCommand.Parameters)
+                    using (DbCommand command = connection.CreateCommand())
                     {
-                        DbParameter parameter = command.CreateParameter();
-                        parameter.ParameterName = pitem.Key;
-                        parameter.Value = pitem.Value;
+                        command.CommandText = dbCommand.CommandText;
+                        command.Connection = connection;
+                        command.Transaction = trans;
 
-                        command.Parameters.Add(parameter);
+                        foreach (var pitem in dbCommand.Parameters)
+                        {
+                            DbParameter parameter = command.CreateParameter();
+                            parameter.ParameterName = pitem.Key;
+                            parameter.Value = pitem.Value;
+
+                            command.Parameters.Add(parameter);
+                        }
+
+                        if (dbCommand.CommandTimeout > 0)
+                        {
+                            command.CommandTimeout = dbCommand.CommandTimeout;
+                        }
+
+                        object result;
+                        using (DbDataReader dataReader = command.ExecuteReader())
+                        {
+                            if (dataReader.RecordsAffected > -1)
+                            {
+                                result = dataReader.RecordsAffected;
+                            }
+                            else
+                            {
+                                result = ToJson(dataReader);
+                            }
+                        }
+                        trans.Commit();
+                        return result;
                     }
-
-                    if (dbCommand.CommandTimeout > 0)
-                    {
-                        command.CommandTimeout = dbCommand.CommandTimeout;
-                    }
-
-                    string json;
-                    using (DbDataReader dataReader = command.ExecuteReader())
-                    {
-                        json = ToJson(dataReader);
-                    }
-
-                    trans.Commit();
-
-                    return json;
                 }
             }
         }
@@ -82,7 +89,10 @@ namespace Geone.DataService.Core.Service.DBaaS
                 }
                 jsonString.Append("},");
             }
-            jsonString.Remove(jsonString.Length - 1, 1);
+            if (jsonString.Length > 1)
+            {
+                jsonString.Remove(jsonString.Length - 1, 1);
+            }
             jsonString.Append("]");
             return jsonString.ToString();
         }
@@ -103,7 +113,7 @@ namespace Geone.DataService.Core.Service.DBaaS
             }
             else
             {
-                return $"\"{str}\"";
+                return $"{str}";
             }
         }
 

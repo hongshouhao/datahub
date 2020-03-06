@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Routing;
+﻿using Geone.DataService.Core.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Geone.DataService
@@ -32,17 +30,18 @@ namespace Geone.DataService
             }
         }
 
-        /// <summary>
-        /// TODO:如果有需要还可以细分
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
         Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             if (!context.Response.HasStarted)
             {
-                return ResponseErrorMessage(context, exception);
+                if (exception is DataServiceException)
+                {
+                    return ResponseErrorMessage(context, exception, true);
+                }
+                else
+                {
+                    return ResponseErrorMessage(context, exception, false);
+                }
             }
             else
             {
@@ -67,18 +66,30 @@ namespace Geone.DataService
             return context.Response.WriteAsync(exception.Message);
         }
 
-        static Task ResponseErrorMessage(HttpContext context, Exception exception)
+        static Task ResponseErrorMessage(HttpContext context, Exception exception, bool onlyMessage)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 500;
 
-            string result = JsonConvert.SerializeObject(new
+            dynamic result;
+            if (!onlyMessage)
             {
-                error = exception.Message,
-                stackTrace = exception.StackTrace
-            });
+                result = new
+                {
+                    error = exception.Message,
+                    stackTrace = exception.StackTrace
+                };
+            }
+            else
+            {
+                result = new
+                {
+                    error = exception.Message,
+                };
+            }
 
-            return context.Response.WriteAsync(result);
+            string json = JsonConvert.SerializeObject(result);
+            return context.Response.WriteAsync(json);
         }
     }
 }

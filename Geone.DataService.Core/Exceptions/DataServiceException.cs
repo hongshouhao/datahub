@@ -3,9 +3,9 @@ using System;
 
 namespace Geone.DataService.Core.Exceptions
 {
-    public class BizException : Exception
+    public class DataServiceException : Exception
     {
-        public BizException(string message)
+        public DataServiceException(string message)
             : base(message)
         {
         }

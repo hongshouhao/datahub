@@ -10,17 +10,18 @@ namespace Geone.DataService.Core.Service.Aggregate
         {
         }
 
-        public string JsonSchema { get; set; }
+        public JRaw JsonSchema { get; set; }
 
         public void CheckValid()
         {
-            if (string.IsNullOrWhiteSpace(JsonSchema))
+            string json = JsonSchema.ToString();
+            if (string.IsNullOrWhiteSpace(json))
             {
                 throw new ArgumentException("Json Schema 不能为空");
             }
             try
             {
-                JObject.Parse(JsonSchema);
+                JObject.Parse(json);
             }
             catch (JsonException ex)
             {

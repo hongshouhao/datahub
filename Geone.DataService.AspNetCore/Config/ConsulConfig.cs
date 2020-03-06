@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Geone.DataService.Config
+namespace Geone.DataService.AspNetCore.Config
 {
     public class ConsulConfig
     {
