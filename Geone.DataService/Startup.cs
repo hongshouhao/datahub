@@ -1,6 +1,7 @@
 using Geone.DataService.Config;
 using Geone.DataService.Core;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.Service;
 using Geone.DataService.Core.Service.Aggregate;
 using Geone.DataService.Core.Service.DBaaS;
 using Geone.DataService.Core.Service.REST;
@@ -35,7 +36,8 @@ namespace Geone.DataService
             services.AddSingleton<DBaaSExcutor>();
             services.AddSingleton<SoapExcutor>();
             services.AddSingleton<RestExcutor>();
-            services.AddSingleton<AggregateExcutor>();
+            //services.AddSingleton<AggregateExcutor>();
+            services.AddSingleton<ServiceExcutor>();
 
             services.AddSwaggerGen(options =>
             {

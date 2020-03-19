@@ -12,18 +12,19 @@ namespace Geone.DataService.Core.Service
         private readonly DBaaSExcutor _dbaasExcutor;
         private readonly SoapExcutor _soapExcutor;
         private readonly RestExcutor _restExcutor;
-        private readonly AggregateExcutor _aggregateExcutor;
+        //private readonly AggregateExcutor _aggregateExcutor;
 
         public ServiceExcutor(
               DBaaSExcutor dbaasExcutor,
               SoapExcutor soapExcutor,
-              RestExcutor restExcutor,
-              AggregateExcutor aggregateExcutor)
+              RestExcutor restExcutor
+              //AggregateExcutor aggregateExcutor
+            )
         {
             _dbaasExcutor = dbaasExcutor;
             _soapExcutor = soapExcutor;
             _restExcutor = restExcutor;
-            _aggregateExcutor = aggregateExcutor;
+          //  _aggregateExcutor = aggregateExcutor;
         }
 
         public string Excute(ServiceMeta service, object arguments)
@@ -37,7 +38,7 @@ namespace Geone.DataService.Core.Service
                 case ServiceType.DBaaS:
                     return _dbaasExcutor.Excute(service, arguments);
                 case ServiceType.Aggregate:
-                    return _aggregateExcutor.Excute(service, arguments);
+                   // return _aggregateExcutor.Excute(service, arguments);
                 default:
                     throw new NotSupportedException();
             }
