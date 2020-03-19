@@ -1,17 +1,15 @@
 ﻿using Consul;
-using Geone.DataService.Config;
+using Geone.DataService.AspNetCore.Config;
 using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.Service;
-using Geone.DataService.Core.Service.DBaaS;
-using Geone.DataService.Core.Service.SOAP;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geone.DataService.Controllers
+namespace Geone.DataService.AspNetCore.Controllers
 {
     [Route("service")]
     [ApiController]
@@ -36,7 +34,7 @@ namespace Geone.DataService.Controllers
 
         [HttpPost]
         [Route("{name}")]
-        public string Post(string name, [FromBody]object arguments)
+        public object Post(string name, [FromBody]object arguments)
         {
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.GetMetadata() as ServiceMeta;

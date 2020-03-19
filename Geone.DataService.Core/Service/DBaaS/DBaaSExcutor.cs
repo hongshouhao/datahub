@@ -5,7 +5,7 @@ using System;
 
 namespace Geone.DataService.Core.Service.DBaaS
 {
-    public class DBaaSExcutor
+    public class DBaaSExcutor : IExcutor
     {
         readonly DbCommandExcutor _commandExcutor;
         public DBaaSExcutor(MetaRepository repository)
@@ -13,7 +13,7 @@ namespace Geone.DataService.Core.Service.DBaaS
             _commandExcutor = new DbCommandExcutor(repository);
         }
 
-        public string Excute(ServiceMeta service, object arguments)
+        public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.DBaaS)
                 throw new ArgumentException("服务类型不匹配");

@@ -9,13 +9,13 @@ using System.Xml.Linq;
 
 namespace Geone.DataService.Core.Service.SOAP
 {
-    public class SoapExcutor
+    public class SoapExcutor : IExcutor
     {
         public SoapExcutor()
         {
         }
 
-        public string Excute(ServiceMeta service, object arguments)
+        public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.SOAP)
                 throw new ArgumentException("服务类型不匹配");

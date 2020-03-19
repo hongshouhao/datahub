@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Geone.DataService.Models
+namespace Geone.DataService.AspNetCore.Models
 {
     public class MetaModel
     {

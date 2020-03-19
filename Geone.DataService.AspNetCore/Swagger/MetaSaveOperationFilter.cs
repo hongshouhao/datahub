@@ -1,15 +1,17 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataService.AspNetCore.Models;
+using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
+using Geone.DataService.Core.Service.Aggregate;
 using Geone.DataService.Core.Service.DBaaS;
 using Geone.DataService.Core.Service.REST;
 using Geone.DataService.Core.Service.SOAP;
-using Geone.DataService.Models;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 
-namespace Geone.DataService.Swagger
+namespace Geone.DataService.AspNetCore.Swagger
 {
     public class MetaSaveOperationFilter : IOperationFilter
     {
@@ -19,6 +21,7 @@ namespace Geone.DataService.Swagger
             AddDBaaSMeta(operation);
             AddSoapMeta(operation);
             AddRestMeta(operation);
+            AddAggregateMeta(operation);
             AddServiceTestMeta(operation);
         }
 
@@ -98,33 +101,33 @@ namespace Geone.DataService.Swagger
             service.Type = ServiceType.REST;
             service.Content = new RestMeta()
             {
-                CURL = "curl -X GET \"http://jsonplaceholder.typicode.com/posts\""
+                CURL = Samples.Rest.CURL
             };
+            service.ParamsExample = Samples.Rest.Parameters;
             model.Metadata = service;
+
             AddSwaggerExample(operation, model, ServiceType.REST.ToString());
         }
 
         private static void AddAggregateMeta(OpenApiOperation operation)
         {
-            //MetaModel model = new MetaModel();
-            //model.Id = 0;
-            //model.Name = "aggregate";
-            //model.MetaType = MetaType.Service;
-            //model.CreatedDate = DateTime.UtcNow;
-            //model.ModifiedDate = DateTime.UtcNow;
+            MetaModel model = new MetaModel();
+            model.Id = 0;
+            model.Name = "aggregate";
+            model.MetaType = MetaType.Service;
+            model.CreatedDate = DateTime.UtcNow;
+            model.ModifiedDate = DateTime.UtcNow;
 
-            //ServiceMeta service = new ServiceMeta();
-            //service.Type = ServiceType.Aggregate;
+            ServiceMeta service = new ServiceMeta();
+            service.Type = ServiceType.Aggregate;
+            service.Content = new AggregateMeta()
+            {
+                JsonSchema = new JRaw(JsonConvert.SerializeObject(Samples.Aggregate.Schema))
+            };
+            service.ParamsExample = Samples.Aggregate.Parameters;
+            model.Metadata = service;
 
-            //service.Parameters.Add(new Parameter() { Name = "reprojectKey", Value = "my", Type = DataType.String });
-            //service.Parameters.Add(new Parameter() { Name = "Add", Value = "{\"Add\": {\"@xmlns\":\"http://tempuri.org/\", \"intA\" : 1,  \"intB\" : 2}}", Type = DataType.String });
-
-            //service.Content = new AggregateMeta()
-            //{
-            //    AggregateJson = "{\"A\":\"REST$(reprojectKey)\",\"B\":\"soap$(Add)\"}"
-            //};
-            //model.Metadata = service;
-            //AddExample(operation, model, ServiceType.Aggregate.ToString());
+            AddSwaggerExample(operation, model, ServiceType.Aggregate.ToString());
         }
 
         private static void AddServiceTestMeta(OpenApiOperation operation)
@@ -140,6 +143,7 @@ namespace Geone.DataService.Swagger
             test.ServiceName = Samples.Soap.ServiceName;
             test.Body = Samples.Soap.Parameters;
             model.Metadata = test;
+
             AddSwaggerExample(operation, model, MetaType.ServiceTest.ToString());
         }
 

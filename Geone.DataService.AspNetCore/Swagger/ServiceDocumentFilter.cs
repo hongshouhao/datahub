@@ -1,10 +1,11 @@
 ﻿using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
-namespace Geone.DataService.Swagger
+namespace Geone.DataService.AspNetCore.Swagger
 {
     public class ServiceDocumentFilter : IDocumentFilter
     {
@@ -34,13 +35,15 @@ namespace Geone.DataService.Swagger
                 ServiceMeta svcMeta = svcEntity.GetMetadata() as ServiceMeta;
 
                 OpenApiPathItem pathItem = new OpenApiPathItem();
-                pathItem.Description = svcMeta.Description;
 
                 OpenApiOperation operation = new OpenApiOperation();
                 pathItem.AddOperation(OperationType.Post, operation);
 
                 operation.RequestBody = new OpenApiRequestBody();
                 operation.RequestBody.Required = true;
+                operation.Summary = svcMeta.Description;
+                operation.Description = JsonConvert.SerializeObject(svcMeta);
+
                 operation.Tags.Add(new OpenApiTag() { Name = "Service" });
                 operation.Responses.Add("200", new OpenApiResponse() { Description = "Success" });
 

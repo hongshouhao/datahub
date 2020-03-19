@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace Geone.DataService.Config
+namespace Geone.DataService.AspNetCore.Config
 {
     public class ConfigRoot
     {

@@ -4,14 +4,16 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Geone.DataService.Core.Service.REST.cURL
+namespace Geone.cURL
 {
-    public class CURLParser
+    public class cURLParser
     {
-        public static HttpRequestMessage CreateHttpRequest(string requestString)
+        public static HttpRequestMessage CreateHttpRequest(string requestString, Action<ExtractedParams> afterExtracted = null)
         {
             string contentType = "text/plain";
             ExtractedParams details = Parse(requestString);
+            afterExtracted?.Invoke(details);
+
             HttpRequestMessage request = new HttpRequestMessage();
             request.Method = new HttpMethod(details.Method);
             request.RequestUri = new Uri(details.URL);
@@ -101,7 +103,7 @@ namespace Geone.DataService.Core.Service.REST.cURL
                 {
                     if (trimmed.IndexOf("http") != -1) { p.URL = trimmed.Substring(trimmed.IndexOf("http")); continue; }
                 }
-                string pattern = @"(http|smtp|https):\/\/([\w,.,\/,-?=])*";
+                string pattern = "(?<=\")(http|smtp|https):\\/\\/.+?(?=\")";
                 Regex rg = new Regex(pattern);
                 if (!rg.IsMatch(p.URL)) { p.URL = ""; }
                 if (string.IsNullOrEmpty(p.URL))

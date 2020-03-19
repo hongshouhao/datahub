@@ -1,7 +1,6 @@
-using Geone.DataService.Config;
+using Geone.DataService.AspNetCore.Config;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using System.IO;
 
 namespace Geone.DataService
 {

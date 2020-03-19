@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Geone.DataService.Core.Service.REST.cURL
+namespace Geone.cURL
 {
     public class ExtractedParams
     {

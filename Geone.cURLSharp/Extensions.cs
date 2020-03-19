@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Web;
 
-namespace Geone.DataService.Core.Service.REST.cURL
+namespace Geone.cURL
 {
     public static class Extensions
     {
