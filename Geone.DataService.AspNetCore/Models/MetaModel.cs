@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Geone.DataService.AspNetCore.Models
 {
@@ -12,10 +13,13 @@ namespace Geone.DataService.AspNetCore.Models
         }
 
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public MetaType MetaType { get; set; }
+        [Required]
         public object Metadata { get; set; }
-
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
 
@@ -25,6 +29,7 @@ namespace Geone.DataService.AspNetCore.Models
             model.Id = metaEntity.Id;
             model.Name = metaEntity.Name;
             model.MetaType = metaEntity.MetaType;
+            model.Description = metaEntity.Description;
             model.CreatedDate = metaEntity.CreatedDate;
             model.ModifiedDate = metaEntity.ModifiedDate;
             model.Metadata = metaEntity.GetMetadata();
@@ -38,6 +43,7 @@ namespace Geone.DataService.AspNetCore.Models
             metaEntity.Id = this.Id;
             metaEntity.Name = this.Name;
             metaEntity.MetaType = this.MetaType;
+            metaEntity.Description = this.Description;
             metaEntity.CreatedDate = this.CreatedDate;
             metaEntity.ModifiedDate = this.ModifiedDate;
 

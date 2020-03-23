@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Consul\Consul.csproj" />
     <ProjectReference Include="..\Geone.DataService.Core\Geone.DataService.Core.csproj" />
+    <ProjectReference Include="..\Geone.IdentityServer4.Client\Geone.IdentityServer4.Client.csproj" />
   </ItemGroup>
 
 </Project>

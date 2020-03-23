@@ -17,7 +17,7 @@ namespace Geone.DataService.Core.Service.REST
         public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.REST)
-                throw new ArgumentException("服务类型不匹配");
+                throw new ArgumentException("参数错误: 服务类型不匹配");
 
             RestMeta restMeta = (RestMeta)service.Content;
             restMeta.CheckValid();
@@ -41,17 +41,11 @@ namespace Geone.DataService.Core.Service.REST
 
         void SetCurl(ExtractedParams parameters, JObject argument)
         {
+            if (argument == null) return;
+
             bool hasBody = parameters.Data.Count > 0;
             bool hasHeader = parameters.Headers.Count > 0;
             bool hasQuery = Regex.IsMatch(parameters.URL, @"\{[a-zA-Z0-9_]+\}");
-
-            if (hasBody || hasHeader || hasQuery)
-            {
-                if (argument == null)
-                {
-                    throw new ArgumentException("服务输入参数不正确");
-                }
-            }
 
             if (hasBody && (hasHeader || hasQuery))
             {
@@ -71,7 +65,7 @@ namespace Geone.DataService.Core.Service.REST
             }
             else
             {
-                throw new Exception();
+                throw new Exception("逻辑错误");
             }
         }
 

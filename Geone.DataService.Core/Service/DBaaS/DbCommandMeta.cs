@@ -21,12 +21,12 @@ namespace Geone.DataService.Core.Service.DBaaS
         {
             if (string.IsNullOrWhiteSpace(Database))
             {
-                throw new ArgumentException("未指定数据库");
+                throw new ArgumentException("参数错误: 未指定数据库");
             }
 
             if (string.IsNullOrWhiteSpace(CommandText))
             {
-                throw new ArgumentException("SQL不能为空");
+                throw new ArgumentException("参数错误: SQL不能为空");
             }
         }
     }

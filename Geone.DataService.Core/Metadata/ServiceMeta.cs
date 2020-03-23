@@ -17,13 +17,12 @@ namespace Geone.DataService.Core.Metadata
         public ServiceType Type { get; set; }
         public object Content { get; set; }
         public object ParamsExample { get; set; }
-        public string Description { get; set; }
 
         public void CheckValid()
         {
             if (Content == null)
             {
-                throw new ArgumentException("服务内容不能为空");
+                throw new ArgumentException("参数错误: 服务内容不能为空");
             }
 
             ((IServiceContent)Content).CheckValid();

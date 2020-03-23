@@ -1,5 +1,4 @@
 ﻿using Geone.DataService.Core.Metadata;
-using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using System.Data.Common;
@@ -14,7 +13,6 @@ namespace Geone.DataService.Core.Service.DBaaS
             DbProviderFactories.RegisterFactory(DbTypes.MsSql.ToString(), SqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory(DbTypes.MySql.ToString(), MySqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory(DbTypes.PostgreSql.ToString(), NpgsqlFactory.Instance);
-            DbProviderFactories.RegisterFactory(DbTypes.Sqlite.ToString(), SqliteFactory.Instance);
         }
 
         public static DbProviderFactory Get(DbTypes dbType)

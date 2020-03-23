@@ -16,7 +16,7 @@ namespace Geone.DataService.Core.Service.DBaaS
         public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.DBaaS)
-                throw new ArgumentException("服务类型不匹配");
+                throw new ArgumentException("参数错误: 服务类型不匹配");
 
             DbCommandMeta cmd = (DbCommandMeta)service.Content;
             cmd.CheckValid();
@@ -34,7 +34,7 @@ namespace Geone.DataService.Core.Service.DBaaS
                     object val = ((JValue)jprop.Value).Value;
                     if (val == null)
                     {
-                        throw new ArgumentException($"输入参数非法[{propName}]");
+                        throw new ArgumentException($"参数错误: {propName}值不能为空");
                     }
                     cmd.Parameters.Add(propName, val);
                 }

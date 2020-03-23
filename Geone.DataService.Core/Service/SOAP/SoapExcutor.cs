@@ -1,4 +1,5 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataService.Core.Exceptions;
+using Geone.DataService.Core.Metadata;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoapHttpClient;
@@ -18,7 +19,7 @@ namespace Geone.DataService.Core.Service.SOAP
         public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.SOAP)
-                throw new ArgumentException("服务类型不匹配");
+                throw new ArgumentException("参数错误: 服务类型不匹配");
 
             SoapMeta soapMeta = (SoapMeta)service.Content;
             soapMeta.CheckValid();
@@ -40,7 +41,7 @@ namespace Geone.DataService.Core.Service.SOAP
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("服务代理失败: " + result.ReasonPhrase);
+                throw new DataServiceException("服务代理失败: " + result.ReasonPhrase, (int)result.StatusCode);
             }
             else
             {

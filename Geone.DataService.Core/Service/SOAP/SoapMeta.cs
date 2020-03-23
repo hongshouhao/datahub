@@ -14,7 +14,7 @@ namespace Geone.DataService.Core.Service.SOAP
         {
             if (string.IsNullOrWhiteSpace(Uri))
             {
-                throw new ArgumentException("服务地址不能为空");
+                throw new ArgumentException("参数错误: 服务地址不能为空");
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Geone.IdentityServer4.Client;
+using Newtonsoft.Json;
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -13,6 +14,7 @@ namespace Geone.DataService.AspNetCore.Config
 
         public ConsulConfig Consul { get; set; }
         public ServerConfig Server { get; set; }
+        public IdS4Config IdentityServer { get; set; }
 
         [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
@@ -32,8 +34,10 @@ namespace Geone.DataService.AspNetCore.Config
 
             if (string.IsNullOrWhiteSpace(Server.Name))
             {
-                Server.Name = "Data Service Center";
+                Server.Name = "DataHub";
             }
+
+            Server.Name = Server.Name?.Replace(" ", "");
         }
     }
 }

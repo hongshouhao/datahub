@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>Error handling middleware, using RFC7807</Description>
+    <PackageId>Hellang.Middleware.ProblemDetails</PackageId>
+    <PackageTags>middleware;error;exception;RFC7807</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Metadata" Version="1.8.0" />
+  </ItemGroup>
+</Project>
