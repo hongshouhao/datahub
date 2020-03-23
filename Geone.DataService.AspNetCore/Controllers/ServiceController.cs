@@ -1,8 +1,12 @@
 ﻿using Consul;
 using Geone.DataService.AspNetCore.Config;
+using Geone.DataService.Core.Exceptions;
 using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.Service;
+using Geone.IdentityServer4.Client;
+using Geone.IdentityServer4.Client.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,10 +15,13 @@ using System.Linq;
 
 namespace Geone.DataService.AspNetCore.Controllers
 {
-    [Route("service")]
+    [Route(serviceRoute)]
     [ApiController]
+   // [Authorize("AtLeast21")]
     public class ServiceController : ControllerBase
     {
+        private const string serviceRoute = "service";
+
         private readonly ConfigRoot _configRoot;
         private readonly MetaRepository _repository;
         private readonly ServiceExcutor _excutor;
@@ -41,16 +48,67 @@ namespace Geone.DataService.AspNetCore.Controllers
             return _excutor.Excute(serviceMeta, arguments);
         }
 
-        [HttpPost]
-        [Route("register")]
-        public object RegisterAll()
+        [HttpGet]
+        [Route("apis")]
+        public object APIs()
         {
-            if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseURL))
+            return _repository.Query(x => x.MetaType == MetaType.Service)
+                  .Select(x => new { Name = x.Name, URL = $"{Request.Host}/{serviceRoute}/{x.Name}" })
+                  .ToArray();
+        }
+
+        [HttpPost]
+        [Route("registerApisToIds")]
+        public void RegisterApisToIds()
+        {
+            if (string.IsNullOrWhiteSpace(_configRoot.IdentityServer?.BaseURL))
             {
-                return "未配置Consul";
+                throw new DataServiceException("服务端未正确配置[IdentityServer]", 500);
             }
             else
             {
+                IdS4Client client = new IdS4Client(_configRoot.IdentityServer);
+                ApiResourceRegistry api = new ApiResourceRegistry()
+                {
+                    Name = _configRoot.Server.Name,
+                    DisplayName = "数据服务",
+                    Description = $"数据服务[{_configRoot.Server.BaseUrl}]",
+                    Enabled = true,
+                };
+                api.Scopes = new List<ApiScopeRegistry>();
+
+                ApiScopeRegistry[] tests = _repository.Query(x => x.MetaType == MetaType.Service)
+                    .Select(x => new ApiScopeRegistry()
+                    {
+                        Name = $"{_configRoot.Server.Name.ToLower()}.{x.Name.ToLower()}",
+                        Description = x.Description,
+                        DisplayName = x.Description,
+                        Required = false,
+                        ShowInDiscoveryDocument = true,
+                        Emphasize = false,
+                        UserClaims = new List<string>()
+                    }).ToArray();
+
+                api.Scopes.AddRange(tests);
+                client.SaveApiResource(api);
+            }
+        }
+
+        [HttpPost]
+        [Route("registerChecksToConsul")]
+        public object RegisterChecksToConsul()
+        {
+            if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseURL))
+            {
+                throw new DataServiceException("服务端未正确配置[Consul]", 500);
+            }
+            else
+            {
+                if (_configRoot.Server.Host.ToLower().Contains("localhost"))
+                {
+                    throw new DataServiceException("启用[Consul]时服务地址不能使用[localhost], 必须使用此服务所在服务器的[IP]地址", 500);
+                }
+
                 ServiceTestMeta[] tests = _repository.Query(x => x.MetaType == MetaType.ServiceTest)
                     .Select(x => x.GetMetadata() as ServiceTestMeta).ToArray();
 
@@ -69,7 +127,7 @@ namespace Geone.DataService.AspNetCore.Controllers
                         Name = serverConfig.Name,
                         Address = serverConfig.Host,
                         Port = serverConfig.Port,
-                        Tags = new[] { serverConfig.Name },
+                        Tags = new[] { serverConfig.Name }
                     };
 
                     List<AgentServiceCheck> checks = new List<AgentServiceCheck>();
@@ -84,7 +142,7 @@ namespace Geone.DataService.AspNetCore.Controllers
                     {
                         checks.Add(new AgentServiceCheck
                         {
-                            HTTP = $"http://{serverConfig.Host}:{serverConfig.Port}/service/{item.ServiceName}",
+                            HTTP = $"{_configRoot.Server.BaseUrl}/{serviceRoute}/{item.ServiceName}",
                             Method = "POST",
                             Header = item.Header,
                             Body = item.Body.ToString(),
@@ -96,7 +154,7 @@ namespace Geone.DataService.AspNetCore.Controllers
                     WriteResult writeResult = client.Agent.ServiceRegister(registration).Result;
                     if (writeResult.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        return "注册服务失败";
+                        throw new DataServiceException("向[Consul]中注册服务失败", 500);
                     }
                     else
                     {

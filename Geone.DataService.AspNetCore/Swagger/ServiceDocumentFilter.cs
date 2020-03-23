@@ -41,7 +41,7 @@ namespace Geone.DataService.AspNetCore.Swagger
 
                 operation.RequestBody = new OpenApiRequestBody();
                 operation.RequestBody.Required = true;
-                operation.Summary = svcMeta.Description;
+                operation.Summary = svcEntity.Description;
                 operation.Description = JsonConvert.SerializeObject(svcMeta);
 
                 operation.Tags.Add(new OpenApiTag() { Name = "Service" });

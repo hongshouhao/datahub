@@ -11,7 +11,7 @@ namespace Geone.DataService.Core.Service.REST
         {
             if (string.IsNullOrWhiteSpace(CURL))
             {
-                throw new ArgumentException("CURL不能为空");
+                throw new ArgumentException("参数错误: CURL不能为空");
             }
         }
     }

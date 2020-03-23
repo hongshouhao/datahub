@@ -1,5 +1,6 @@
 ﻿using Geone.DataService.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +25,7 @@ namespace Geone.DataService
             {
                 await _next(context);
             }
-            catch (Exception ex)
+            catch ( Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
             }

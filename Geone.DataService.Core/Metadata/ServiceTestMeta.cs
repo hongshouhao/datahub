@@ -15,7 +15,7 @@ namespace Geone.DataService.Core.Metadata
         {
             if (string.IsNullOrWhiteSpace(ServiceName))
             {
-                throw new ArgumentException("未指定服务名");
+                throw new ArgumentException("参数错误: 未指定服务名");
             }
         }
     }

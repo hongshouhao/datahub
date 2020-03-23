@@ -14,7 +14,7 @@ namespace Geone.DataService.Core.Metadata
         {
             if (string.IsNullOrWhiteSpace(ConnectionString))
             {
-                throw new ArgumentException("数据库连接字符串不能为空");
+                throw new ArgumentException("参数错误: 数据库连接字符串不能为空");
             }
         }
     }
@@ -23,7 +23,6 @@ namespace Geone.DataService.Core.Metadata
     public enum DbTypes
     {
         MsSql,
-        Sqlite,
         PostgreSql,
         MySql
     }

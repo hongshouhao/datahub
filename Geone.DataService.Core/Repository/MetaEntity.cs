@@ -20,6 +20,8 @@ namespace Geone.DataService.Core.Repository
         [Required]
         [StringLength(StringLengthAttribute.MaxText)]
         public string Metadata { get; set; }
+        [StringLength(StringLengthAttribute.MaxText)]
+        public string Description { get; set; }
 
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
@@ -51,5 +53,23 @@ namespace Geone.DataService.Core.Repository
         Db,
         Service,
         ServiceTest
+    }
+
+    public static class MetaType_
+    {
+        public static string GetDescription(this MetaType metaType)
+        {
+            switch (metaType)
+            {
+                case MetaType.Db:
+                    return "数据库";
+                case MetaType.Service:
+                    return "服务";
+                case MetaType.ServiceTest:
+                    return "服务测试";
+                default:
+                    throw new NotSupportedException();
+            }
+        }
     }
 }

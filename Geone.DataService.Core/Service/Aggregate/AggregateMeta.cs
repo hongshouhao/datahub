@@ -17,7 +17,7 @@ namespace Geone.DataService.Core.Service.Aggregate
             string json = JsonSchema.ToString();
             if (string.IsNullOrWhiteSpace(json))
             {
-                throw new ArgumentException("Json Schema 不能为空");
+                throw new ArgumentException("参数错误: Json Schema不能为空");
             }
             try
             {

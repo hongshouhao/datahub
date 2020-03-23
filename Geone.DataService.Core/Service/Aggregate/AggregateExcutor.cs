@@ -22,7 +22,7 @@ namespace Geone.DataService.Core.Service.Aggregate
         public object Excute(ServiceMeta service, object arguments)
         {
             if (service.Type != ServiceType.Aggregate)
-                throw new ArgumentException("服务类型不匹配");
+                throw new ArgumentException("参数错误: 服务类型不匹配");
 
             AggregateMeta meta = (AggregateMeta)service.Content;
             meta.CheckValid();
