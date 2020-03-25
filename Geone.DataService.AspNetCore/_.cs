@@ -66,8 +66,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 Description = $"数据服务Swagger[{config.Server.BaseUrl}/swagger]",
                 RedirectUri = $"{config.Server.BaseUrl}swagger/oauth2-redirect.html"
             };
-
-            client.SaveClient(clientRegistry);
+            try
+            {
+                client.SaveClient(clientRegistry);
+            }
+            catch (IdS4Exception)
+            {
+            }
+            
 
             return app;
         }

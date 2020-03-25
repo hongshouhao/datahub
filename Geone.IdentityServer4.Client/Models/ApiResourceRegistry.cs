@@ -25,8 +25,8 @@ namespace Geone.IdentityServer4.Client.Models
             {
                 if (string.IsNullOrWhiteSpace(item.Name))
                     throw new ArgumentException($"{nameof(ApiScopeRegistry.Name)}不能为空");
-                if (string.IsNullOrWhiteSpace(item.DisplayName))
-                    throw new ArgumentException($"{nameof(ApiScopeRegistry.DisplayName)}不能为空");
+                //if (string.IsNullOrWhiteSpace(item.DisplayName))
+                //    throw new ArgumentException($"{nameof(ApiScopeRegistry.DisplayName)}不能为空");
             }
         }
     }

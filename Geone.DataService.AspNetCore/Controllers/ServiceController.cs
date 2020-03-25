@@ -17,7 +17,6 @@ namespace Geone.DataService.AspNetCore.Controllers
 {
     [Route(serviceRoute)]
     [ApiController]
-   // [Authorize("AtLeast21")]
     public class ServiceController : ControllerBase
     {
         private const string serviceRoute = "service";
