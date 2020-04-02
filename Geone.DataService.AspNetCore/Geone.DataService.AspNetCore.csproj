@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Geone.IdentityServer4.Client\Geone.IdentityServer4.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Auth\" />
+  </ItemGroup>
+
 </Project>
