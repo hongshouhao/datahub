@@ -1,18 +1,12 @@
 using Geone.DataService.AspNetCore.Swagger;
+using Geone.DataService.Authorize;
 using Geone.DataService.Core.Exceptions;
 using Geone.IdentityServer4.Client;
 using Hellang.Middleware.ProblemDetails;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using ServiceStack.Logging;
-using System;
 
 namespace Geone.DataService
 {
@@ -45,13 +39,10 @@ namespace Geone.DataService
                 });
             });
 
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AtLeast21", policy =>
-            //    {
-
-            //    });
-            //});
+            if (Configuration.GetValue<bool>("FilterEnable"))
+            {
+                services.AddMvc(options => options.Filters.Add<AuthorizationFilter>());
+            }
 
             services.AddProblemDetails(options =>
             {
@@ -73,6 +64,7 @@ namespace Geone.DataService
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Data Hub Web API V1");
             });
+
             app.UseCors("AllowAny");
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
