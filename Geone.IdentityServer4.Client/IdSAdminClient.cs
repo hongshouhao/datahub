@@ -4,12 +4,12 @@ using RestSharp;
 
 namespace Geone.IdentityServer4.Client
 {
-    public class IdS4Client
+    public class IdSAdminClient
     {
         private readonly RestClient _client;
-        public IdS4Client(IdS4Config config)
+        public IdSAdminClient(IdSAdminConfig config)
         {
-            _client = new RestClient(config.BaseURL);
+            _client = new RestClient(config.BaseUrl);
         }
 
         public ApiResourceRegistry GetApiResource(string name, bool throwIfNotFound)
@@ -22,7 +22,7 @@ namespace Geone.IdentityServer4.Client
             IRestResponse response = _client.Get(request);
             if (!response.IsSuccessful)
             {
-                throw new IdS4Exception("调用IdS4 RESTful API失败(查询服务): \r\n" + response.Content, (int)response.StatusCode);
+                throw new IdSException("调用IdS4 RESTful API失败(查询服务): \r\n" + response.Content, (int)response.StatusCode);
             }
 
             ApiResourceRegistry[] apis = JObject.Parse(response.Content)["apiResources"]?.ToObject<ApiResourceRegistry[]>();
@@ -30,7 +30,7 @@ namespace Geone.IdentityServer4.Client
             {
                 if (throwIfNotFound)
                 {
-                    throw new IdS4Exception($"IdS4中未找到服务[{name}]", 404);
+                    throw new IdSException($"IdS4中未找到服务[{name}]", 404);
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace Geone.IdentityServer4.Client
             }
             else
             {
-                throw new IdS4Exception($"调用IdS4 RESTful API失败(注册服务)\r\n: {response.Content}", (int)response.StatusCode);
+                throw new IdSException($"调用IdS4 RESTful API失败(注册服务)\r\n: {response.Content}", (int)response.StatusCode);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Geone.IdentityServer4.Client
             }
             else
             {
-                throw new IdS4Exception($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
+                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
             }
         }
     }

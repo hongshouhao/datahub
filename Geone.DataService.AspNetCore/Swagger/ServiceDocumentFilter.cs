@@ -1,8 +1,10 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataService.AspNetCore.Config;
+using Geone.DataService.Core.Metadata;
 using Geone.DataService.Core.Repository;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Geone.DataService.AspNetCore.Swagger
@@ -46,6 +48,21 @@ namespace Geone.DataService.AspNetCore.Swagger
 
                 operation.Tags.Add(new OpenApiTag() { Name = "Service" });
                 operation.Responses.Add("200", new OpenApiResponse() { Description = "Success" });
+
+                operation.Security =
+                    new List<OpenApiSecurityRequirement>
+                    {
+                        new OpenApiSecurityRequirement
+                        {
+                            {
+                                new OpenApiSecurityScheme
+                                {
+                                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
+                                },
+                                new[] { RootConfig.Value.Server.Name + "." + svcEntity.Name, svcEntity.Description }
+                            }
+                        }
+                    };
 
                 OpenApiMediaType mediaType = new OpenApiMediaType();
                 operation.RequestBody.Content.Add("application/json", mediaType);

@@ -3,23 +3,41 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Geone.DataService.AspNetCore.Config
 {
-    public class ConfigRoot
+    public class RootConfig
     {
-        public static ConfigRoot Read(string jsonFile)
+        public static RootConfig Value { get; private set; }
+        public static RootConfig Read()
         {
-            return JsonConvert.DeserializeObject<ConfigRoot>(File.ReadAllText(jsonFile));
+            if (File.Exists("appsettings.json"))
+            {
+                Value = JsonConvert.DeserializeObject<RootConfig>(File.ReadAllText("appsettings.json"));
+            }
+            else
+            {
+                Value = new RootConfig()
+                {
+                    Server = new ServerConfig()
+                    {
+                        Host = "127.0.0.1",
+                        Port = 9293,
+                        Name = serviceName
+                    }
+                };
+            }
+            return Value;
         }
 
         public ConsulConfig Consul { get; set; }
         public ServerConfig Server { get; set; }
-        public IdS4Config IdentityServer { get; set; }
-        public string[] IPSafeList { get; set; }
-        public Dictionary<string,string[]> ActionRoles { get; set; }
+        public IdSAdminConfig IdSAdmin { get; set; }
+        public IdSServerConfig IdSServer { get; set; }
 
+        const string serviceName = "datahub";
         [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
@@ -38,7 +56,7 @@ namespace Geone.DataService.AspNetCore.Config
 
             if (string.IsNullOrWhiteSpace(Server.Name))
             {
-                Server.Name = "DataHub";
+                Server.Name = serviceName;
             }
 
             Server.Name = Server.Name?.Replace(" ", "");

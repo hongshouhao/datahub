@@ -1,33 +1,61 @@
+using Geone.AuthorisationFilter.Authorisation;
+using Geone.DataService.AspNetCore.Config;
 using Geone.DataService.AspNetCore.Swagger;
-using Geone.DataService.Authorize;
 using Geone.DataService.Core.Exceptions;
 using Geone.IdentityServer4.Client;
 using Hellang.Middleware.ProblemDetails;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace Geone.DataService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup()
         {
-            Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDataServices("appsettings.json");
+            services.AddDataServices();
+
+            if (!string.IsNullOrWhiteSpace(RootConfig.Value.IdSServer?.BaseUrl))
+            {
+                services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                        .AddIdentityServerAuthentication(options =>
+                        {
+                            options.RequireHttpsMetadata = false;
+                            options.ApiName = RootConfig.Value.Server.Name;
+                            options.Authority = RootConfig.Value.IdSServer.BaseUrl;
+                            options.ApiSecret = RootConfig.Value.IdSServer.ApiSecret;
+                        });
+            }
+
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Data Hub Web API", Version = "v1" });
                 options.DocumentFilter<ServiceDocumentFilter>();
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        Password = new OpenApiOAuthFlow
+                        {
+                            TokenUrl = new Uri(RootConfig.Value.IdSServer.BaseUrl + "/connect/token"),
+                        },
+                        Implicit = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri(RootConfig.Value.IdSServer.BaseUrl + "/connect/authorize"),
+                        }
+                    },
+                });
                 options.EnableAnnotations();
             });
+
             services.AddSwaggerGenNewtonsoftSupport();
             services.AddCors(options =>
             {
@@ -39,18 +67,13 @@ namespace Geone.DataService
                 });
             });
 
-            if (Configuration.GetValue<bool>("FilterEnable"))
-            {
-                services.AddMvc(options => options.Filters.Add<AuthorizationFilter>());
-            }
-
             services.AddProblemDetails(options =>
             {
                 options.Map<DataServiceException>(ex => new StatusCodeProblemDetails(ex.Status) { Detail = ex.Message });
-                options.Map<IdS4Exception>(ex => new StatusCodeProblemDetails(ex.Status));
+                options.Map<IdSException>(ex => new StatusCodeProblemDetails(ex.Status));
             });
 
-            services.AddControllers()
+            services.AddControllers(options => options.Filters.Add<DynamicAuthorize>())
                     .Add400ProblemDetails()
                     .AddNewtonsoftJson();
         }
@@ -58,17 +81,20 @@ namespace Geone.DataService
         public void Configure(IApplicationBuilder app)
         {
             app.UseDataServices();
-            app.AddSwaggerClientToIds();
+            app.RegisteSwaggerClientToIdentityServer();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Data Hub Web API V1");
+                options.OAuthClientId(RootConfig.Value.Server.Name + "-swagger");
             });
 
-            app.UseCors("AllowAny");
+            app.UseProblemDetails();
+            app.UseCors();
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
-            app.UseProblemDetails();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -1,4 +1,6 @@
-﻿using Geone.DataService.AspNetCore.Config;
+﻿using Geone.AuthorisationFilter;
+using Geone.DataService.AspNetCore.Auth;
+using Geone.DataService.AspNetCore.Config;
 using Geone.DataService.Core;
 using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.Service;
@@ -17,9 +19,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class _
     {
-        public static IServiceCollection AddDataServices(this IServiceCollection services, string configFile)
+        public static IServiceCollection AddDataServices(this IServiceCollection services)
         {
-            services.AddSingleton(ConfigRoot.Read(configFile));
+            services.AddSingleton(RootConfig.Value);
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
@@ -29,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AggregateExcutor>();
             services.AddSingleton<ServiceExcutor>();
 
+            services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
             return services;
         }
 
@@ -40,10 +43,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return app;
         }
 
-        public static IApplicationBuilder AddSwaggerClientToIds(this IApplicationBuilder app)
+        public static IApplicationBuilder RegisteSwaggerClientToIdentityServer(this IApplicationBuilder app)
         {
-            ConfigRoot config = (ConfigRoot)app.ApplicationServices.GetService(typeof(ConfigRoot));
-            if (string.IsNullOrWhiteSpace(config.IdentityServer?.BaseURL))
+            RootConfig config = (RootConfig)app.ApplicationServices.GetService(typeof(RootConfig));
+            if (string.IsNullOrWhiteSpace(config.IdSAdmin?.BaseUrl))
             {
                 return app;
             }
@@ -52,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var services = repository.Query(x => x.MetaType == MetaType.Service)
                 .Select(x => $"{config.Server.Name.ToLower()}.{x.Name.ToLower()}").ToList();
 
-            IdS4Client client = new IdS4Client(config.IdentityServer);
+            IdSAdminClient client = new IdSAdminClient(config.IdSAdmin);
             ClientRegistry clientRegistry = new ClientRegistry()
             {
                 AllowedGrantType = "implicit",
@@ -61,19 +64,19 @@ namespace Microsoft.Extensions.DependencyInjection
                 AllowAccessTokensViaBrowser = true,
                 AllowedScopes = services,
                 ClientUri = $"{config.Server.BaseUrl}/swagger",
-                ClientId = config.Server.Name + "Swagger",
-                ClientName = config.Server.Name + "Swagger",
+                ClientId = config.Server.Name + "-swagger",
+                ClientName = config.Server.Name + " swagger",
                 Description = $"数据服务Swagger[{config.Server.BaseUrl}/swagger]",
-                RedirectUri = $"{config.Server.BaseUrl}swagger/oauth2-redirect.html"
+                RedirectUri = $"{config.Server.BaseUrl}/swagger/oauth2-redirect.html"
             };
+
             try
             {
                 client.SaveClient(clientRegistry);
             }
-            catch (IdS4Exception)
+            catch (IdSException)
             {
             }
-            
 
             return app;
         }

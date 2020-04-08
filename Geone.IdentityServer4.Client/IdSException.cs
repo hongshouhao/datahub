@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Geone.IdentityServer4.Client
 {
-    public class IdS4Exception : Exception
+    public class IdSException : Exception
     {
-        public IdS4Exception(string message, int status) : base(message)
+        public IdSException(string message, int status) : base(message)
         {
             Status = status;
         }

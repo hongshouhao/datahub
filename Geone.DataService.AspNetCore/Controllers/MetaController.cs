@@ -1,6 +1,7 @@
 ﻿using Geone.DataService.AspNetCore.Models;
 using Geone.DataService.AspNetCore.Swagger;
 using Geone.DataService.Core.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceStack.OrmLite;

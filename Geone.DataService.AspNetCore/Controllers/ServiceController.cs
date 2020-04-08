@@ -6,7 +6,6 @@ using Geone.DataService.Core.Repository;
 using Geone.DataService.Core.Service;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -21,13 +20,13 @@ namespace Geone.DataService.AspNetCore.Controllers
     {
         private const string serviceRoute = "service";
 
-        private readonly ConfigRoot _configRoot;
+        private readonly RootConfig _configRoot;
         private readonly MetaRepository _repository;
         private readonly ServiceExcutor _excutor;
         private readonly ILogger<ServiceController> _logger;
 
         public ServiceController(
-            ConfigRoot configRoot,
+            RootConfig configRoot,
             MetaRepository repository,
             ServiceExcutor excutor,
             ILogger<ServiceController> logger)
@@ -45,6 +44,7 @@ namespace Geone.DataService.AspNetCore.Controllers
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.GetMetadata() as ServiceMeta;
             return _excutor.Excute(serviceMeta, arguments);
+
         }
 
         [HttpGet]
@@ -60,13 +60,13 @@ namespace Geone.DataService.AspNetCore.Controllers
         [Route("registerApisToIds")]
         public void RegisterApisToIds()
         {
-            if (string.IsNullOrWhiteSpace(_configRoot.IdentityServer?.BaseURL))
+            if (string.IsNullOrWhiteSpace(_configRoot.IdSAdmin?.BaseUrl))
             {
                 throw new DataServiceException("服务端未正确配置[IdentityServer]", 500);
             }
             else
             {
-                IdS4Client client = new IdS4Client(_configRoot.IdentityServer);
+                IdSAdminClient client = new IdSAdminClient(_configRoot.IdSAdmin);
                 ApiResourceRegistry api = new ApiResourceRegistry()
                 {
                     Name = _configRoot.Server.Name,
@@ -97,7 +97,7 @@ namespace Geone.DataService.AspNetCore.Controllers
         [Route("registerChecksToConsul")]
         public object RegisterChecksToConsul()
         {
-            if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseURL))
+            if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseUrl))
             {
                 throw new DataServiceException("服务端未正确配置[Consul]", 500);
             }
@@ -113,7 +113,7 @@ namespace Geone.DataService.AspNetCore.Controllers
 
                 using (var client = new ConsulClient(c =>
                 {
-                    c.Address = new Uri(_configRoot.Consul.BaseURL);
+                    c.Address = new Uri(_configRoot.Consul.BaseUrl);
                 }))
                 {
                     ServerConfig serverConfig = _configRoot.Server;

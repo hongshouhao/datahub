@@ -31,7 +31,7 @@ namespace Geone.DataService
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls(ConfigRoot.Read("appsettings.json").Server.ToString());
+                    webBuilder.UseUrls(RootConfig.Read().Server.ToString());
                     webBuilder.UseStartup<Startup>();
                 });
     }

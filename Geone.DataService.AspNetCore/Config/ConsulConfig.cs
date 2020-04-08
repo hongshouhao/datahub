@@ -6,7 +6,7 @@ namespace Geone.DataService.AspNetCore.Config
 {
     public class ConsulConfig
     {
-        public string BaseURL { get; set; }
+        public string BaseUrl { get; set; }
         [JsonConverter(typeof(DurationTimespanConverter))]
         public TimeSpan? Interval { get; set; } = new TimeSpan(0, 10, 0);
     }
