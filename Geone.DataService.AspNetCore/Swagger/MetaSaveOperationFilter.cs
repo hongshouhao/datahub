@@ -1,17 +1,17 @@
-﻿using Geone.DataService.AspNetCore.Models;
-using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.Service.Aggregate;
-using Geone.DataService.Core.Service.DBaaS;
-using Geone.DataService.Core.Service.REST;
-using Geone.DataService.Core.Service.SOAP;
+﻿using Geone.DataHub.AspNetCore.Models;
+using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
+using Geone.DataHub.Core.Service.Aggregate;
+using Geone.DataHub.Core.Service.DBaaS;
+using Geone.DataHub.Core.Service.REST;
+using Geone.DataHub.Core.Service.SOAP;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 
-namespace Geone.DataService.AspNetCore.Swagger
+namespace Geone.DataHub.AspNetCore.Swagger
 {
     public class MetaSaveOperationFilter : IOperationFilter
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Geone.DataService.Core.Service.SOAP
+namespace Geone.DataHub.Core.Service.SOAP
 {
     public class SoapMeta : IServiceContent
     {

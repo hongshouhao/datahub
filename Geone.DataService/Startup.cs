@@ -1,7 +1,7 @@
 using Geone.AuthorisationFilter.Authorisation;
-using Geone.DataService.AspNetCore.Config;
-using Geone.DataService.AspNetCore.Swagger;
-using Geone.DataService.Core.Exceptions;
+using Geone.DataHub.AspNetCore.Config;
+using Geone.DataHub.AspNetCore.Swagger;
+using Geone.DataHub.Core.Exceptions;
 using Geone.IdentityServer4.Client;
 using Hellang.Middleware.ProblemDetails;
 using IdentityServer4.AccessTokenValidation;
@@ -9,18 +9,34 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Collections.Generic;
+using Serilog;
+using Serilog.Enrichers.AspNetCore.HttpContext;
+using Serilog.Core.Enrichers;
+using Serilog.Events;
+using System.Net.Http;
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.DiagnosticSource;
 
-namespace Geone.DataService
+namespace Geone.DataHub
 {
     public class Startup
     {
-        public Startup()
+        public Startup(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
+
+        private IConfiguration _configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDataServices();
+            services.AddDataHub();
+            services.AddHttpClient();
 
             if (!string.IsNullOrWhiteSpace(RootConfig.Value.IdSServer?.BaseUrl))
             {
@@ -69,19 +85,23 @@ namespace Geone.DataService
 
             services.AddProblemDetails(options =>
             {
-                options.Map<DataServiceException>(ex => new StatusCodeProblemDetails(ex.Status) { Detail = ex.Message });
-                options.Map<IdSException>(ex => new StatusCodeProblemDetails(ex.Status));
+                options.Map<DataHubException>(ex => new StatusCodeProblemDetails(ex.Status) { Detail = ex.Message });
+                options.Map<IdSException>(ex => new StatusCodeProblemDetails(ex.Status) { Detail = ex.Message });
             });
 
             services.AddControllers(options => options.Filters.Add<DynamicAuthorize>())
-                    .Add400ProblemDetails()
-                    .AddNewtonsoftJson();
+                        .Add400ProblemDetails()
+                        .AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseDataServices();
-            app.RegisteSwaggerClientToIdentityServer();
+            app.UseElasticApm(_configuration, new HttpDiagnosticsSubscriber());
+            app.UseSerilogRequestLogging();
+
+            app.SetupDataHub();
+            app.RegisteSwagger2IdentityServer();
+
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
@@ -89,12 +109,35 @@ namespace Geone.DataService
                 options.OAuthClientId(RootConfig.Value.Server.Name + "-swagger");
             });
 
-            app.UseProblemDetails();
-            app.UseCors();
-            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSerilogLogContext(options =>
+            {
+                options.EnrichersForContextFactory = context =>
+                {
+                    List<PropertyEnricher> list = new List<PropertyEnricher>()
+                    {
+                        new PropertyEnricher("TraceId", context.TraceIdentifier),
+                        new PropertyEnricher("UserId", context.User.Identity.Name),
+                        new PropertyEnricher("UserName", context.User.FindFirst("cnname")?.Value),
+                        new PropertyEnricher("Scopes", string.Join(",", context.User.FindAll("scope").Select(x=>x.Value))),
+                        new PropertyEnricher("Roles", string.Join(",", context.User.FindAll("role").Select(x=>x.Value))),
+                    };
+
+                    if (Log.IsEnabled(LogEventLevel.Debug))
+                    {
+                        list.Add(new PropertyEnricher("Route", string.Join(",", context.Request.RouteValues.Select(x => $"{x.Key}:{x.Value}"))));
+                        list.Add(new PropertyEnricher("Body", context.Request.BodyAsString()));
+                    }
+
+                    return list;
+                };
+            });
+
+            app.UseProblemDetails();
+            app.UseCors();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

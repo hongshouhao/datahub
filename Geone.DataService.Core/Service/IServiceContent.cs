@@ -1,4 +1,4 @@
-﻿namespace Geone.DataService.Core.Service
+﻿namespace Geone.DataHub.Core.Service
 {
     public interface IServiceContent
     {

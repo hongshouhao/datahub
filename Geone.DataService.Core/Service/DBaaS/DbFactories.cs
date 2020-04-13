@@ -1,10 +1,10 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataHub.Core.Metadata;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace Geone.DataService.Core.Service.DBaaS
+namespace Geone.DataHub.Core.Service.DBaaS
 {
     public class DbFactories
     {

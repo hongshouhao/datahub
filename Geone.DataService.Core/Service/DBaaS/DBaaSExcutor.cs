@@ -1,9 +1,9 @@
-﻿using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Geone.DataService.Core.Service.DBaaS
+namespace Geone.DataHub.Core.Service.DBaaS
 {
     public class DBaaSExcutor : IExcutor
     {

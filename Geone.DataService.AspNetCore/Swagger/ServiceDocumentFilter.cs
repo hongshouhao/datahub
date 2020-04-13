@@ -1,13 +1,13 @@
-﻿using Geone.DataService.AspNetCore.Config;
-using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.AspNetCore.Config;
+using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geone.DataService.AspNetCore.Swagger
+namespace Geone.DataHub.AspNetCore.Swagger
 {
     public class ServiceDocumentFilter : IDocumentFilter
     {

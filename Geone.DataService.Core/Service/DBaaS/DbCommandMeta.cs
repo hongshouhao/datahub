@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Geone.DataService.Core.Service.DBaaS
+namespace Geone.DataHub.Core.Service.DBaaS
 {
     public class DbCommandMeta : IServiceContent
     {

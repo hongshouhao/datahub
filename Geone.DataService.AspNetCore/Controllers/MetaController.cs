@@ -1,6 +1,6 @@
-﻿using Geone.DataService.AspNetCore.Models;
-using Geone.DataService.AspNetCore.Swagger;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.AspNetCore.Models;
+using Geone.DataHub.AspNetCore.Swagger;
+using Geone.DataHub.Core.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geone.DataService.AspNetCore.Controllers
+namespace Geone.DataHub.AspNetCore.Controllers
 {
     [ApiController]
     [Route("meta")]

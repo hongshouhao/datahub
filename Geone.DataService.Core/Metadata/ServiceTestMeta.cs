@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 
-namespace Geone.DataService.Core.Metadata
+namespace Geone.DataHub.Core.Metadata
 {
     [Serializable]
     public class ServiceTestMeta : IMeta

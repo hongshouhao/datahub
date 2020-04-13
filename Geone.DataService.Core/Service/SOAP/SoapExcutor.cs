@@ -1,19 +1,22 @@
-﻿using Geone.DataService.Core.Exceptions;
-using Geone.DataService.Core.Metadata;
+﻿using Geone.DataHub.Core.Exceptions;
+using Geone.DataHub.Core.Metadata;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoapHttpClient;
 using SoapHttpClient.Enums;
 using System;
+using System.Net.Http;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Geone.DataService.Core.Service.SOAP
+namespace Geone.DataHub.Core.Service.SOAP
 {
     public class SoapExcutor : IExcutor
     {
-        public SoapExcutor()
+        private readonly IHttpClientFactory _httpClientFactory;
+        public SoapExcutor(IHttpClientFactory httpClientFactory)
         {
+            _httpClientFactory = httpClientFactory;
         }
 
         public object Excute(ServiceMeta service, object arguments)
@@ -36,12 +39,12 @@ namespace Geone.DataService.Core.Service.SOAP
                 xele = xdoc.Root;
             }
 
-            var soapClient = new SoapClient();
+            var soapClient = new SoapClient(_httpClientFactory);
             var result = soapClient.Post(new Uri(soapMeta.Uri), SoapVersion.Soap11, body: xele);
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new DataServiceException("服务代理失败: " + result.ReasonPhrase, (int)result.StatusCode);
+                throw new DataHubException("服务代理失败: " + result.ReasonPhrase, (int)result.StatusCode);
             }
             else
             {

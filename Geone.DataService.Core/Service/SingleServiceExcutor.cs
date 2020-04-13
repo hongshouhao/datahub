@@ -1,10 +1,10 @@
-﻿using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Service.DBaaS;
-using Geone.DataService.Core.Service.REST;
-using Geone.DataService.Core.Service.SOAP;
+﻿using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Service.DBaaS;
+using Geone.DataHub.Core.Service.REST;
+using Geone.DataHub.Core.Service.SOAP;
 using System;
 
-namespace Geone.DataService.Core.Service
+namespace Geone.DataHub.Core.Service
 {
     public class SingleServiceExcutor : IExcutor
     {

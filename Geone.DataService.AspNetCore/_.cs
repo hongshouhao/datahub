@@ -1,13 +1,13 @@
 ﻿using Geone.AuthorisationFilter;
-using Geone.DataService.AspNetCore.Auth;
-using Geone.DataService.AspNetCore.Config;
-using Geone.DataService.Core;
-using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.Service;
-using Geone.DataService.Core.Service.Aggregate;
-using Geone.DataService.Core.Service.DBaaS;
-using Geone.DataService.Core.Service.REST;
-using Geone.DataService.Core.Service.SOAP;
+using Geone.DataHub.AspNetCore.Auth;
+using Geone.DataHub.AspNetCore.Config;
+using Geone.DataHub.Core;
+using Geone.DataHub.Core.Repository;
+using Geone.DataHub.Core.Service;
+using Geone.DataHub.Core.Service.Aggregate;
+using Geone.DataHub.Core.Service.DBaaS;
+using Geone.DataHub.Core.Service.REST;
+using Geone.DataHub.Core.Service.SOAP;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class _
     {
-        public static IServiceCollection AddDataServices(this IServiceCollection services)
+        public static IServiceCollection AddDataHub(this IServiceCollection services)
         {
             services.AddSingleton(RootConfig.Value);
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
@@ -35,15 +35,15 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IApplicationBuilder UseDataServices(this IApplicationBuilder app)
+        public static IApplicationBuilder SetupDataHub(this IApplicationBuilder app)
         {
             IDbConnectionFactory dbFactory = app.ApplicationServices.GetService(typeof(IDbConnectionFactory)) as IDbConnectionFactory;
-            DsSetup setup = new DsSetup(dbFactory);
+            DatahubSetup setup = new DatahubSetup(dbFactory);
             setup.Initialize();
             return app;
         }
 
-        public static IApplicationBuilder RegisteSwaggerClientToIdentityServer(this IApplicationBuilder app)
+        public static IApplicationBuilder RegisteSwagger2IdentityServer(this IApplicationBuilder app)
         {
             RootConfig config = (RootConfig)app.ApplicationServices.GetService(typeof(RootConfig));
             if (string.IsNullOrWhiteSpace(config.IdSAdmin?.BaseUrl))

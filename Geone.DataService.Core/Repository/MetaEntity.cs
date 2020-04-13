@@ -1,10 +1,10 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataHub.Core.Metadata;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ServiceStack.DataAnnotations;
 using System;
 
-namespace Geone.DataService.Core.Repository
+namespace Geone.DataHub.Core.Repository
 {
     public class MetaEntity : IAudit
     {

@@ -1,9 +1,9 @@
-﻿using Geone.DataService.Core.Metadata;
+﻿using Geone.DataHub.Core.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Geone.DataService.Core.Service
+namespace Geone.DataHub.Core.Service
 {
     public interface IExcutor
     {

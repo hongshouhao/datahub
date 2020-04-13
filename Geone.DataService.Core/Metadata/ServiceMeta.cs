@@ -1,15 +1,15 @@
-﻿using Geone.DataService.Core.Service;
-using Geone.DataService.Core.Service.Aggregate;
-using Geone.DataService.Core.Service.DBaaS;
-using Geone.DataService.Core.Service.REST;
-using Geone.DataService.Core.Service.SOAP;
+﻿using Geone.DataHub.Core.Service;
+using Geone.DataHub.Core.Service.Aggregate;
+using Geone.DataHub.Core.Service.DBaaS;
+using Geone.DataHub.Core.Service.REST;
+using Geone.DataHub.Core.Service.SOAP;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.Serialization;
 
-namespace Geone.DataService.Core.Metadata
+namespace Geone.DataHub.Core.Metadata
 {
     [Serializable]
     public class ServiceMeta : IMeta

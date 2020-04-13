@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Writers;
 
-namespace Geone.DataService.AspNetCore.Swagger
+namespace Geone.DataHub.AspNetCore.Swagger
 {
     internal class OpenApiRawString : IOpenApiAny, IOpenApiPrimitive
     {

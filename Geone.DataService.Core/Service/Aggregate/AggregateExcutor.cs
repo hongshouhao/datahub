@@ -1,12 +1,12 @@
-﻿using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Geone.DataService.Core.Service.Aggregate
+namespace Geone.DataHub.Core.Service.Aggregate
 {
     public class AggregateExcutor : IExcutor
     {

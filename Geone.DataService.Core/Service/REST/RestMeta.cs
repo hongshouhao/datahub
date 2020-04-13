@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 
-namespace Geone.DataService.Core.Service.REST
+namespace Geone.DataHub.Core.Service.REST
 {
     public class RestMeta : IServiceContent
     {

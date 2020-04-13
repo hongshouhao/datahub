@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace Geone.DataService.Core.Metadata
+namespace Geone.DataHub.Core.Metadata
 {
     [Serializable]
     public class DbMeta : IMeta

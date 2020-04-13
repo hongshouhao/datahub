@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Geone.DataService.Core.Service.Aggregate
+namespace Geone.DataHub.Core.Service.Aggregate
 {
     public class AggregateMeta : IServiceContent
     {

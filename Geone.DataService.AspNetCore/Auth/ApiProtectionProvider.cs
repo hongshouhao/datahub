@@ -1,7 +1,7 @@
 ﻿using Geone.AuthorisationFilter;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Geone.DataService.AspNetCore.Auth
+namespace Geone.DataHub.AspNetCore.Auth
 {
     public class ApiProtectionProvider : DefaultApiProtectionProlicyProvider, IApiProtectionProlicyProvider
     {

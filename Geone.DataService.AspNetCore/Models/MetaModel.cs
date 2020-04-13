@@ -1,10 +1,10 @@
-﻿using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.Core.Repository;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Geone.DataService.AspNetCore.Models
+namespace Geone.DataHub.AspNetCore.Models
 {
     public class MetaModel
     {

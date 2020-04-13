@@ -3,7 +3,7 @@
     {
       "Key": "default",
       "Enable": true,
-      "IpAllowedList": [ "localhost", "127.0.0.1" ],
+      "IpAllowedList": [],
       "ApiProtections": [
       ]
     },

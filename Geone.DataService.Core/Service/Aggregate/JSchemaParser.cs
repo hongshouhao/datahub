@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Geone.DataService.Core.Service.Aggregate
+namespace Geone.DataHub.Core.Service.Aggregate
 {
     public class JSchemaParser
     {

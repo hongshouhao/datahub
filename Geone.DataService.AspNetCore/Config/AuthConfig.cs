@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Geone.DataService.AspNetCore.Config
+namespace Geone.DataHub.AspNetCore.Config
 {
     public class AuthConfig
     {

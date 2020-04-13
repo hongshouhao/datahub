@@ -1,4 +1,4 @@
-﻿namespace Geone.DataService.Core.Metadata
+﻿namespace Geone.DataHub.Core.Metadata
 {
     public interface IMeta
     {

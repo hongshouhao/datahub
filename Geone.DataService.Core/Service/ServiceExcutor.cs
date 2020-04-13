@@ -1,8 +1,8 @@
-﻿using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Service.Aggregate;
+﻿using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Service.Aggregate;
 using System;
 
-namespace Geone.DataService.Core.Service
+namespace Geone.DataHub.Core.Service
 {
     public class ServiceExcutor : IExcutor
     {

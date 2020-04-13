@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Geone.DataService.Core.Repository
+namespace Geone.DataHub.Core.Repository
 {
     public interface IAudit
     {

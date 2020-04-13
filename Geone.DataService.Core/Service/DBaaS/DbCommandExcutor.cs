@@ -1,10 +1,10 @@
-﻿using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
+﻿using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
 using System;
 using System.Data.Common;
 using System.Text;
 
-namespace Geone.DataService.Core.Service.DBaaS
+namespace Geone.DataHub.Core.Service.DBaaS
 {
     public class DbCommandExcutor
     {

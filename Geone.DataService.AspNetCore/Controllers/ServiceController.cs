@@ -1,9 +1,9 @@
 ﻿using Consul;
-using Geone.DataService.AspNetCore.Config;
-using Geone.DataService.Core.Exceptions;
-using Geone.DataService.Core.Metadata;
-using Geone.DataService.Core.Repository;
-using Geone.DataService.Core.Service;
+using Geone.DataHub.AspNetCore.Config;
+using Geone.DataHub.Core.Exceptions;
+using Geone.DataHub.Core.Metadata;
+using Geone.DataHub.Core.Repository;
+using Geone.DataHub.Core.Service;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geone.DataService.AspNetCore.Controllers
+namespace Geone.DataHub.AspNetCore.Controllers
 {
     [Route(serviceRoute)]
     [ApiController]
@@ -44,7 +44,6 @@ namespace Geone.DataService.AspNetCore.Controllers
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.GetMetadata() as ServiceMeta;
             return _excutor.Excute(serviceMeta, arguments);
-
         }
 
         [HttpGet]
@@ -62,7 +61,7 @@ namespace Geone.DataService.AspNetCore.Controllers
         {
             if (string.IsNullOrWhiteSpace(_configRoot.IdSAdmin?.BaseUrl))
             {
-                throw new DataServiceException("服务端未正确配置[IdentityServer]", 500);
+                throw new DataHubException("服务端未正确配置[IdentityServer]", 500);
             }
             else
             {
@@ -99,13 +98,13 @@ namespace Geone.DataService.AspNetCore.Controllers
         {
             if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseUrl))
             {
-                throw new DataServiceException("服务端未正确配置[Consul]", 500);
+                throw new DataHubException("服务端未正确配置[Consul]", 500);
             }
             else
             {
                 if (_configRoot.Server.Host.ToLower().Contains("localhost"))
                 {
-                    throw new DataServiceException("启用[Consul]时服务地址不能使用[localhost], 必须使用此服务所在服务器的[IP]地址", 500);
+                    throw new DataHubException("启用[Consul]时服务地址不能使用[localhost], 必须使用此服务所在服务器的[IP]地址", 500);
                 }
 
                 ServiceTestMeta[] tests = _repository.Query(x => x.MetaType == MetaType.ServiceTest)
@@ -153,7 +152,7 @@ namespace Geone.DataService.AspNetCore.Controllers
                     WriteResult writeResult = client.Agent.ServiceRegister(registration).Result;
                     if (writeResult.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        throw new DataServiceException("向[Consul]中注册服务失败", 500);
+                        throw new DataHubException("向[Consul]中注册服务失败", 500);
                     }
                     else
                     {

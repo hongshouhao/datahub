@@ -1,14 +1,14 @@
-﻿using Geone.DataService.Core.Exceptions;
+﻿using Geone.DataHub.Core.Exceptions;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
-using Geone.DataService.Core.Metadata;
+using Geone.DataHub.Core.Metadata;
 using System.Data;
 
-namespace Geone.DataService.Core.Repository
+namespace Geone.DataHub.Core.Repository
 {
     public class MetaRepository
     {
@@ -33,7 +33,7 @@ namespace Geone.DataService.Core.Repository
                 MetaEntity entity = db.Single<MetaEntity>(x => x.Name == name && x.MetaType == metaType);
                 if (entity == null && throwIfNotFound)
                 {
-                    throw new DataServiceException($"找不到\"{metaType.GetDescription()}({name})\"元数据", 404);
+                    throw new DataHubException($"找不到\"{metaType.GetDescription()}({name})\"元数据", 404);
                 }
 
                 return entity;
@@ -65,7 +65,7 @@ namespace Geone.DataService.Core.Repository
         {
             if (Get(metaEntity.MetaType, metaEntity.Name, false) != null)
             {
-                throw new DataServiceException($"已存在\"{metaEntity.MetaType.GetDescription()}({metaEntity.Name})\"元数据", 409);
+                throw new DataHubException($"已存在\"{metaEntity.MetaType.GetDescription()}({metaEntity.Name})\"元数据", 409);
             }
 
             using (var db = _dbFactory.Open())
@@ -94,7 +94,7 @@ namespace Geone.DataService.Core.Repository
 
                 if (serviceEntity == null)
                 {
-                    throw new DataServiceException($"\"服务测试({metaEntity.Name})\"元数据存在错误: 找不到\"服务测试({serviceTestMeta.ServiceName})\"元数据", 404);
+                    throw new DataHubException($"\"服务测试({metaEntity.Name})\"元数据存在错误: 找不到\"服务测试({serviceTestMeta.ServiceName})\"元数据", 404);
                 }
             }
         }

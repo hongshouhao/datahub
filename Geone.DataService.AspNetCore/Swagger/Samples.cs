@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Xml.Linq;
 
-namespace Geone.DataService.AspNetCore.Swagger
+namespace Geone.DataHub.AspNetCore.Swagger
 {
     public class Samples
     {

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Geone.DataService.AspNetCore.Config
+namespace Geone.DataHub.AspNetCore.Config
 {
     public class RootConfig
     {
@@ -22,11 +22,6 @@ namespace Geone.DataService.AspNetCore.Config
                 Value = new RootConfig()
                 {
                     Server = new ServerConfig()
-                    {
-                        Host = "127.0.0.1",
-                        Port = 9293,
-                        Name = serviceName
-                    }
                 };
             }
             return Value;
@@ -37,28 +32,11 @@ namespace Geone.DataService.AspNetCore.Config
         public IdSAdminConfig IdSAdmin { get; set; }
         public IdSServerConfig IdSServer { get; set; }
 
-        const string serviceName = "datahub";
         [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
             if (Server == null)
                 Server = new ServerConfig();
-
-            if (Server.Port == 0)
-            {
-                Server.Port = 9293;
-            }
-
-            if (string.IsNullOrWhiteSpace(Server.Host))
-            {
-                Server.Host = "127.0.0.1";
-            }
-
-            if (string.IsNullOrWhiteSpace(Server.Name))
-            {
-                Server.Name = serviceName;
-            }
-
             Server.Name = Server.Name?.Replace(" ", "");
         }
     }

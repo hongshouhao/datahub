@@ -1,17 +1,19 @@
 ﻿using Geone.cURL;
-using Geone.DataService.Core.Metadata;
+using Geone.DataHub.Core.Metadata;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
-namespace Geone.DataService.Core.Service.REST
+namespace Geone.DataHub.Core.Service.REST
 {
     public class RestExcutor : IExcutor
     {
-        public RestExcutor()
+        private readonly IHttpClientFactory _httpClientFactory;
+        public RestExcutor(IHttpClientFactory httpClientFactory)
         {
+            _httpClientFactory = httpClientFactory;
         }
 
         public object Excute(ServiceMeta service, object arguments)
@@ -30,7 +32,7 @@ namespace Geone.DataService.Core.Service.REST
             }
 
             HttpRequestMessage httpRequest = cURLParser.CreateHttpRequest(curl, parameters => SetCurl(parameters, jarg));
-            using (HttpClient client = new HttpClient())
+            using (HttpClient client = _httpClientFactory.CreateClient())
             {
                 HttpResponseMessage response = client.SendAsync(httpRequest, HttpCompletionOption.ResponseContentRead).Result;
                 response.EnsureSuccessStatusCode();

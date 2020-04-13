@@ -1,38 +1,39 @@
-using Geone.DataService.AspNetCore.Config;
+using Geone.DataHub.AspNetCore.Config;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.AspNetCore;
+using Serilog.Events;
 using System;
+using System.IO;
+using Microsoft.Extensions.Logging;
 
-namespace Geone.DataService
+namespace Geone.DataHub
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-            try
-            {
-                logger.Debug("init main");
-                CreateHostBuilder(args).Build().Run();
-            }
-            catch (Exception exception)
-            {
-                logger.Error(exception, "Stopped program because of exception");
-                throw;
-            }
-            finally
-            {
-                NLog.LogManager.Shutdown();
-            }
-
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls(RootConfig.Read().Server.ToString());
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.CaptureStartupErrors(true)
+                              .UseSetting("detailedErrors", "true")
+                              .UseUrls(RootConfig.Read().Server.ToString())
+                              .UseStartup<Startup>()
+                              .ConfigureLogging(builder =>
+                              {
+                                  builder.ClearProviders();
+                                  builder.AddSerilog(dispose: true);
+                              })
+                              .UseSerilog((context, configuration) =>
+                              {
+                                  configuration.ReadFrom.Configuration(context.Configuration, "Serilog");
+                              });
                 });
     }
 }
