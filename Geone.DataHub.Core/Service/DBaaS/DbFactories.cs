@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using Npgsql;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Data.OracleClient;
 
 namespace Geone.DataHub.Core.Service.DBaaS
 {
@@ -13,6 +14,7 @@ namespace Geone.DataHub.Core.Service.DBaaS
             DbProviderFactories.RegisterFactory(DbTypes.MsSql.ToString(), SqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory(DbTypes.MySql.ToString(), MySqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory(DbTypes.PostgreSql.ToString(), NpgsqlFactory.Instance);
+            DbProviderFactories.RegisterFactory(DbTypes.Oracle.ToString(), OracleClientFactory.Instance);
         }
 
         public static DbProviderFactory Get(DbTypes dbType)

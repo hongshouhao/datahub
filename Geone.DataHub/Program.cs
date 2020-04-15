@@ -1,12 +1,9 @@
+using Elastic.Apm.SerilogEnricher;
 using Geone.DataHub.AspNetCore.Config;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Serilog;
-using Serilog.AspNetCore;
-using Serilog.Events;
-using System;
-using System.IO;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Geone.DataHub
 {
@@ -32,7 +29,8 @@ namespace Geone.DataHub
                               })
                               .UseSerilog((context, configuration) =>
                               {
-                                  configuration.ReadFrom.Configuration(context.Configuration, "Serilog");
+                                  configuration.ReadFrom.Configuration(context.Configuration, "Serilog")
+                                  .Enrich.WithElasticApmCorrelationInfo();
                               });
                 });
     }

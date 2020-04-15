@@ -1,4 +1,5 @@
-﻿using Geone.DataHub.Core.Metadata;
+﻿using Geone.DataHub.Core.APM;
+using Geone.DataHub.Core.Metadata;
 using Geone.DataHub.Core.Repository;
 using System;
 using System.Data.Common;
@@ -14,25 +15,28 @@ namespace Geone.DataHub.Core.Service.DBaaS
             _repository = repository;
         }
 
-        public object Excute(DbCommandMeta dbCommand)
+        public object Excute(DbCommandMeta cmdMeta)
         {
-            MetaEntity entity = _repository.Get(MetaType.Db, dbCommand.Database);
+            MetaEntity entity = _repository.Get(MetaType.Db, cmdMeta.Database);
             DbMeta dbMeta = entity.GetMetadata() as DbMeta;
 
             DbProviderFactory provider = DbFactories.Get(dbMeta.Type);
             using (DbConnection connection = provider.CreateConnection())
             {
+                Guid connId = DbClientDiagnostic.BeforeOpenConnection(dbMeta.Type, dbMeta.ConnectionString);
                 connection.ConnectionString = dbMeta.ConnectionString;
                 connection.Open();
+                DbClientDiagnostic.AfterConnecting(connId);
+
                 using (DbTransaction trans = connection.BeginTransaction())
                 {
                     using (DbCommand command = connection.CreateCommand())
                     {
-                        command.CommandText = dbCommand.CommandText;
+                        command.CommandText = cmdMeta.CommandText;
                         command.Connection = connection;
                         command.Transaction = trans;
 
-                        foreach (var pitem in dbCommand.Parameters)
+                        foreach (var pitem in cmdMeta.Parameters)
                         {
                             DbParameter parameter = command.CreateParameter();
                             parameter.ParameterName = pitem.Key;
@@ -41,13 +45,18 @@ namespace Geone.DataHub.Core.Service.DBaaS
                             command.Parameters.Add(parameter);
                         }
 
-                        if (dbCommand.CommandTimeout > 0)
+                        if (cmdMeta.CommandTimeout > 0)
                         {
-                            command.CommandTimeout = dbCommand.CommandTimeout;
+                            command.CommandTimeout = cmdMeta.CommandTimeout;
                         }
 
                         object result;
-                        using (DbDataReader dataReader = command.ExecuteReader())
+
+                        Guid excId = DbClientDiagnostic.BeforeExecutingCommand(dbMeta.Type, command, cmdMeta.Parameters);
+                        DbDataReader dataReader = command.ExecuteReader();
+                        DbClientDiagnostic.AfterExecutingCommand(excId);
+
+                        using (dataReader)
                         {
                             if (dataReader.RecordsAffected > -1)
                             {
@@ -55,9 +64,13 @@ namespace Geone.DataHub.Core.Service.DBaaS
                             }
                             else
                             {
-                                result = ToJson(dataReader);
+                                Guid readId = DbClientDiagnostic.BeforeReadingResult();
+                                var json = ReadJson(dataReader);
+                                DbClientDiagnostic.AfterReadingResult(readId, json.Item2, json.Item1);
+                                result = json.Item1;
                             }
                         }
+
                         trans.Commit();
                         return result;
                     }
@@ -65,36 +78,43 @@ namespace Geone.DataHub.Core.Service.DBaaS
             }
         }
 
-        public static string ToJson(DbDataReader dataReader)
+        public static Tuple<string, int> ReadJson(DbDataReader dataReader)
         {
-            StringBuilder jsonString = new StringBuilder();
-            jsonString.Append("[");
+            StringBuilder json = new StringBuilder();
+
+            json.Append("[");
+            int count = 0;
             while (dataReader.Read())
             {
-                jsonString.Append("{");
+                count++;
+
+                json.Append("{");
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
                     Type type = dataReader.GetFieldType(i);
-                    jsonString.AppendFormat("\"{0}\":", dataReader.GetName(i));
+                    json.AppendFormat("\"{0}\":", dataReader.GetName(i));
                     string strValue = StringFormat(dataReader[i].ToString(), type);
 
                     if (i < dataReader.FieldCount - 1)
                     {
-                        jsonString.AppendFormat("{0},", strValue);
+                        json.AppendFormat("{0},", strValue);
                     }
                     else
                     {
-                        jsonString.Append(strValue);
+                        json.Append(strValue);
                     }
                 }
-                jsonString.Append("},");
+                json.Append("},");
             }
-            if (jsonString.Length > 1)
+
+            if (json.Length > 1)
             {
-                jsonString.Remove(jsonString.Length - 1, 1);
+                json.Remove(json.Length - 1, 1);
             }
-            jsonString.Append("]");
-            return jsonString.ToString();
+
+            json.Append("]");
+
+            return new Tuple<string, int>(json.ToString(), count);
         }
 
         private static string StringFormat(string str, Type type)

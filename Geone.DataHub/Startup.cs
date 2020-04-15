@@ -1,26 +1,24 @@
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.DiagnosticSource;
 using Geone.AuthorisationFilter.Authorisation;
 using Geone.DataHub.AspNetCore.Config;
 using Geone.DataHub.AspNetCore.Swagger;
+using Geone.DataHub.Core.APM;
 using Geone.DataHub.Core.Exceptions;
 using Geone.IdentityServer4.Client;
 using Hellang.Middleware.ProblemDetails;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using System;
-using Microsoft.Extensions.Configuration;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Collections.Generic;
 using Serilog;
-using Serilog.Enrichers.AspNetCore.HttpContext;
 using Serilog.Core.Enrichers;
+using Serilog.Enrichers.AspNetCore.HttpContext;
 using Serilog.Events;
-using System.Net.Http;
-using Elastic.Apm.AspNetCore;
-using Elastic.Apm.DiagnosticSource;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Geone.DataHub
 {
@@ -37,6 +35,7 @@ namespace Geone.DataHub
         {
             services.AddDataHub();
             services.AddHttpClient();
+            services.AddHttpContextAccessor();
 
             if (!string.IsNullOrWhiteSpace(RootConfig.Value.IdSServer?.BaseUrl))
             {
@@ -96,7 +95,7 @@ namespace Geone.DataHub
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseElasticApm(_configuration, new HttpDiagnosticsSubscriber());
+            app.UseElasticApm(_configuration, new HttpDiagnosticsSubscriber(), new DbClientDiagnosticsSubscriber());
             app.UseSerilogRequestLogging();
 
             app.SetupDataHub();
@@ -119,7 +118,6 @@ namespace Geone.DataHub
                 {
                     List<PropertyEnricher> list = new List<PropertyEnricher>()
                     {
-                        new PropertyEnricher("TraceId", context.TraceIdentifier),
                         new PropertyEnricher("UserId", context.User.Identity.Name),
                         new PropertyEnricher("UserName", context.User.FindFirst("cnname")?.Value),
                         new PropertyEnricher("Scopes", string.Join(",", context.User.FindAll("scope").Select(x=>x.Value))),

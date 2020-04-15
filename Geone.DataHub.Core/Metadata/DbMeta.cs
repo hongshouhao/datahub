@@ -24,6 +24,7 @@ namespace Geone.DataHub.Core.Metadata
     {
         MsSql,
         PostgreSql,
-        MySql
+        MySql,
+        Oracle
     }
 }

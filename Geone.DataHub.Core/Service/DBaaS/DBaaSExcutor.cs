@@ -23,24 +23,40 @@ namespace Geone.DataHub.Core.Service.DBaaS
 
             if (arguments != null)
             {
-                JObject jarg = (JObject)arguments;
-                foreach (var jprop in jarg.Properties())
+                if (arguments is JObject jarg)
                 {
-                    string propName = jprop.Name;
-                    if (!propName.StartsWith("@"))
+                    foreach (var jprop in jarg.Properties())
                     {
-                        propName = $"@{propName}";
+                        AddParameter(cmd, jprop);
                     }
-                    object val = ((JValue)jprop.Value).Value;
-                    if (val == null)
-                    {
-                        throw new ArgumentException($"参数错误: {propName}值不能为空");
-                    }
-                    cmd.Parameters.Add(propName, val);
+                }
+                else if (arguments is JValue jval)
+                {
+                    JProperty jprop = (JProperty)jval.Parent;
+                    AddParameter(cmd, jprop);
+                }
+                else
+                {
+                    throw new ArgumentException($"参数错误: [{arguments}]必须是Json对象");
                 }
             }
 
             return _commandExcutor.Excute(cmd);
+        }
+
+        private static void AddParameter(DbCommandMeta cmd, JProperty jprop)
+        {
+            string propName = jprop.Name;
+            if (!jprop.Name.StartsWith("@"))
+            {
+                propName = $"@{jprop.Name}";
+            }
+            object val = ((JValue)jprop.Value).Value;
+            if (val == null)
+            {
+                throw new ArgumentException($"参数错误: {propName}值不能为空");
+            }
+            cmd.Parameters.Add(propName, val);
         }
     }
 }
