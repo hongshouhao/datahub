@@ -13,6 +13,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 {
     [ApiController]
     [Route("meta")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
     public class MetaController : ControllerBase
     {
         private readonly ILogger<MetaController> _logger;

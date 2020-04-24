@@ -52,8 +52,10 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             MetaRepository repository = (MetaRepository)app.ApplicationServices.GetService(typeof(MetaRepository));
-            var services = repository.Query(x => x.MetaType == MetaType.Service)
+            var scopes = repository.Query(x => x.MetaType == MetaType.Service)
                 .Select(x => $"{config.Server.Name.ToLower()}.{x.Name.ToLower()}").ToList();
+           
+            scopes.Add("roles");
 
             IdSAdminClient client = new IdSAdminClient(config.IdSAdmin);
             ClientRegistry clientRegistry = new ClientRegistry()
@@ -62,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 AllowOfflineAccess = false,
                 BaseURL = config.Server.BaseUrl,
                 AllowAccessTokensViaBrowser = true,
-                AllowedScopes = services,
+                AllowedScopes = scopes,
                 ClientUri = $"{config.Server.BaseUrl}/swagger",
                 ClientId = config.Server.Name + "-swagger",
                 ClientName = config.Server.Name + " swagger",

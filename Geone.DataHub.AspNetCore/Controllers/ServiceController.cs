@@ -1,13 +1,17 @@
 ﻿using Consul;
+using Geone.AuthorisationFilter;
 using Geone.DataHub.AspNetCore.Config;
+using Geone.DataHub.AspNetCore.Swagger;
 using Geone.DataHub.Core.Exceptions;
 using Geone.DataHub.Core.Metadata;
 using Geone.DataHub.Core.Repository;
 using Geone.DataHub.Core.Service;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +20,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 {
     [Route(serviceRoute)]
     [ApiController]
+    [SwaggerOperationFilter(typeof(AuthorizeCheckOperationFilter))]
     public class ServiceController : ControllerBase
     {
         private const string serviceRoute = "service";
@@ -39,6 +44,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 
         [HttpPost]
         [Route("{name}")]
+        [DynamicAuthorize]
         public object Post(string name, [FromBody]object arguments)
         {
             MetaEntity entity = _repository.Get(MetaType.Service, name);
@@ -48,6 +54,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 
         [HttpGet]
         [Route("apis")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
         public object APIs()
         {
             return _repository.Query(x => x.MetaType == MetaType.Service)
@@ -57,6 +64,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 
         [HttpPost]
         [Route("registerApisToIds")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
         public void RegisterApisToIds()
         {
             if (string.IsNullOrWhiteSpace(_configRoot.IdSAdmin?.BaseUrl))
@@ -94,6 +102,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 
         [HttpPost]
         [Route("registerChecksToConsul")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
         public object RegisterChecksToConsul()
         {
             if (string.IsNullOrWhiteSpace(_configRoot.Consul?.BaseUrl))

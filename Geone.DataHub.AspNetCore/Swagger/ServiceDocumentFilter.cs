@@ -11,7 +11,7 @@ namespace Geone.DataHub.AspNetCore.Swagger
 {
     public class ServiceDocumentFilter : IDocumentFilter
     {
-        MetaRepository _repository;
+        readonly MetaRepository _repository;
         public ServiceDocumentFilter(MetaRepository repository)
         {
             _repository = repository;
@@ -47,7 +47,6 @@ namespace Geone.DataHub.AspNetCore.Swagger
                 operation.Description = JsonConvert.SerializeObject(svcMeta);
 
                 operation.Tags.Add(new OpenApiTag() { Name = "Service" });
-                operation.Responses.Add("200", new OpenApiResponse() { Description = "Success" });
 
                 operation.Security =
                     new List<OpenApiSecurityRequirement>
@@ -59,7 +58,7 @@ namespace Geone.DataHub.AspNetCore.Swagger
                                 {
                                     Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
                                 },
-                                new[] { RootConfig.Value.Server.Name + "." + svcEntity.Name, svcEntity.Description }
+                                new[] { RootConfig.Value.Server.Name + "." + svcEntity.Name }
                             }
                         }
                     };
