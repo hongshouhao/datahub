@@ -1,4 +1,4 @@
-﻿using Geone.AuthorisationFilter;
+﻿using Geone.AuthorisationFilter.ResourceAuth;
 using Geone.DataService.AspNetCore.Auth;
 using Geone.DataService.AspNetCore.Config;
 using Geone.DataService.Core;
@@ -11,6 +11,7 @@ using Geone.DataService.Core.Service.SOAP;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class _
     {
-        public static IServiceCollection AddDataServices(this IServiceCollection services)
+        public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton(RootConfig.Value);
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
@@ -31,7 +32,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AggregateExcutor>();
             services.AddSingleton<ServiceExcutor>();
 
-            services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
+            var openauthSection = configuration.GetSection("OpenAuth");
+            string host = openauthSection["Host"];
+            string role = openauthSection["AdminRole"];
+            string appKey = openauthSection["AppKey"];
+
+            //services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
+            services.AddAuthorisationProlicy((sp) => new ApiAuthProlicyResourceAuthProvider(configuration));
             return services;
         }
 

@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\common-lib\Infrastructure.NetStandard\Geone.AuthorisationFilter\Geone.AuthorisationFilter.csproj" />
+    <ProjectReference Include="..\..\openauth.net\src\OpenAuth.NetStandard.2.0\Geone.Privileges.ResourceAuth\Geone.Privileges.ResourceAuth.csproj" />
   </ItemGroup>
 
 </Project>
