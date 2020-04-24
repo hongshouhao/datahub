@@ -1,4 +1,4 @@
-﻿using Geone.AuthorisationFilter;
+﻿using Geone.AuthorisationFilter.ResourceAuth;
 using Geone.DataHub.AspNetCore.Auth;
 using Geone.DataHub.AspNetCore.Config;
 using Geone.DataHub.Core;
@@ -11,6 +11,7 @@ using Geone.DataHub.Core.Service.SOAP;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using System.Linq;
@@ -31,7 +32,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AggregateExcutor>();
             services.AddSingleton<ServiceExcutor>();
 
-            services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
+            var openauthSection = configuration.GetSection("OpenAuth");
+            string host = openauthSection["Host"];
+            string role = openauthSection["AdminRole"];
+            string appKey = openauthSection["AppKey"];
+
+            //services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
+            services.AddAuthorisationProlicy((sp) => new ApiAuthProlicyResourceAuthProvider(configuration));
             return services;
         }
 

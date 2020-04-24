@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Geone.IdentityServer4.Client
+﻿namespace Geone.IdentityServer4.Client
 {
     public class IdSAdminConfig
     {
