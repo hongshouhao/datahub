@@ -1,6 +1,10 @@
 ﻿using Geone.IdentityServer4.Client.Models;
+using IdentityModel.Client;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Geone.IdentityServer4.Client
 {
@@ -73,6 +77,56 @@ namespace Geone.IdentityServer4.Client
             {
                 throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
             }
+        }
+
+        public string GetUsers(IdSServerConfig config)
+        {
+            var request = new RestRequest("api/Users", Method.GET);
+            request.AddParameter("page", "1");
+            request.AddParameter("pageSize", int.MaxValue);
+
+            request.AddHeader("Authorization", string.Format("Bearer {0}", GetClientToken(config)));
+
+            IRestResponse response = _client.Execute(request);
+            if (!response.IsSuccessful)
+            {
+                throw new IdSException("获取所有用户失败: \r\n" + response.Content, (int)response.StatusCode);
+            }
+
+            return response.Content;
+        }
+
+        public string GetClientToken(IdSServerConfig config)
+        {
+            string tokenUrl = config.BaseUrl + "/connect/token";
+            HttpClient client = new HttpClient();
+
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 
+                | System.Net.SecurityProtocolType.Tls11 
+                | System.Net.SecurityProtocolType.Tls;
+
+            client.BaseAddress = new Uri(tokenUrl);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            var c = client.RequestTokenAsync(new TokenRequest()
+            {
+                Address = tokenUrl,
+                ClientId = config.ApiName,
+                ClientSecret = config.ApiSecret,
+
+                //GrantType = ConfigurationManager.AppSettings["GrantType"],
+                //Parameters =
+                //{
+                //    { "scope", ConfigurationManager.AppSettings["Method"] },
+                //}
+
+            }).GetAwaiter();
+
+            var r = c.GetResult();
+
+            if (r.IsError) throw new Exception(r.Error);
+
+            return r.AccessToken;
         }
     }
 }
