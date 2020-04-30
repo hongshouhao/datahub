@@ -12,14 +12,15 @@ using System.Linq;
 namespace Geone.DataHub.AspNetCore.Controllers
 {
     [ApiController]
-    [Route("meta")]
+    [Route("metadata")]
+    [Produces("application/json", "application/problem+json")]
     [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
-    public class MetaController : ControllerBase
+    public class MetadataController : ControllerBase
     {
-        private readonly ILogger<MetaController> _logger;
+        private readonly ILogger<MetadataController> _logger;
         private readonly MetaRepository _repository;
 
-        public MetaController(MetaRepository repository, ILogger<MetaController> logger)
+        public MetadataController(MetaRepository repository, ILogger<MetadataController> logger)
         {
             _repository = repository;
             _logger = logger;

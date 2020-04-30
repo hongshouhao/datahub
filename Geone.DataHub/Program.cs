@@ -20,7 +20,7 @@ namespace Geone.DataHub
                 {
                     webBuilder.CaptureStartupErrors(true)
                               .UseSetting("detailedErrors", "true")
-                              .UseUrls(RootConfig.Read().Server.ToString())
+                              .UseUrls(Root.Read().Server.ToString())
                               .UseStartup<Startup>()
                               .ConfigureLogging(builder =>
                               {
@@ -30,7 +30,7 @@ namespace Geone.DataHub
                               .UseSerilog((context, configuration) =>
                               {
                                   configuration.ReadFrom.Configuration(context.Configuration, "Serilog")
-                                  .Enrich.WithElasticApmCorrelationInfo();
+                                    .Enrich.WithElasticApmCorrelationInfo();
                               });
                 });
     }

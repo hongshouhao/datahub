@@ -11,6 +11,11 @@ namespace Geone.IdentityServer4.Client
             Status = status;
         }
 
+        public IdSException(string message, int status, Exception exception) : base(message, exception)
+        {
+            Status = status;
+        }
+
         public int Status { get; private set; }
     }
 }

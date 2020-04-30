@@ -8,35 +8,34 @@ using System.Runtime.Serialization;
 
 namespace Geone.DataHub.AspNetCore.Config
 {
-    public class RootConfig
+    public class Root
     {
-        public static RootConfig Value { get; private set; }
-        public static RootConfig Read()
+        public static Root Value { get; private set; }
+        public static Root Read()
         {
             if (File.Exists("appsettings.json"))
             {
-                Value = JsonConvert.DeserializeObject<RootConfig>(File.ReadAllText("appsettings.json"));
+                Value = JsonConvert.DeserializeObject<Root>(File.ReadAllText("appsettings.json"));
             }
             else
             {
-                Value = new RootConfig()
+                Value = new Root()
                 {
-                    Server = new ServerConfig()
+                    Server = new Server()
                 };
             }
             return Value;
         }
 
-        public ConsulConfig Consul { get; set; }
-        public ServerConfig Server { get; set; }
-        public IdSAdminConfig IdSAdmin { get; set; }
-        public IdSServerConfig IdSServer { get; set; }
+        public Consul Consul { get; set; }
+        public Server Server { get; set; }
+        public IdSConfig IdentityServer { get; set; }
 
         [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
             if (Server == null)
-                Server = new ServerConfig();
+                Server = new Server();
             Server.Name = Server.Name?.Replace(" ", "");
         }
     }

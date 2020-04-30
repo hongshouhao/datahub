@@ -36,7 +36,7 @@ namespace Geone.DataHub
             services.AddHttpClient();
             services.AddHttpContextAccessor();
 
-            if (!string.IsNullOrWhiteSpace(RootConfig.Value.IdSServer?.BaseUrl))
+            if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
             {
                 services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                         .AddIdentityServerAuthentication(options =>
@@ -44,9 +44,9 @@ namespace Geone.DataHub
                             options.RequireHttpsMetadata = false;
                             options.RoleClaimType = "role";
                             options.NameClaimType = "name";
-                            options.ApiName = RootConfig.Value.Server.Name;
-                            options.Authority = RootConfig.Value.IdSServer.BaseUrl;
-                            options.ApiSecret = RootConfig.Value.IdSServer.ApiSecret;
+                            options.ApiName = Root.Value.Server.Name;
+                            options.ApiSecret = Root.Value.Server.ApiSecret;
+                            options.Authority = Root.Value.IdentityServer.Authority;
                         });
             }
 
@@ -63,18 +63,11 @@ namespace Geone.DataHub
                     {
                         Password = new OpenApiOAuthFlow
                         {
-                            TokenUrl = new Uri(RootConfig.Value.IdSServer.BaseUrl + "/connect/token"),
-                            Scopes = new Dictionary<string, string>
-                            {
-                            }
+                            TokenUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/token"),
                         },
                         Implicit = new OpenApiOAuthFlow
                         {
-                            AuthorizationUrl = new Uri(RootConfig.Value.IdSServer.BaseUrl + "/connect/authorize"),
-                            Scopes = new Dictionary<string, string>
-                            {
-                                { "openid", "openid" }
-                            }
+                            AuthorizationUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/authorize"),
                         }
                     }
                 });
@@ -145,7 +138,7 @@ namespace Geone.DataHub
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Data Hub Web API V1");
-                options.OAuthClientId(RootConfig.Value.Server.Name + "-swagger");
+                options.OAuthClientId(Root.Value.Server.Name + "-swagger");
             });
 
             app.UseRouting();

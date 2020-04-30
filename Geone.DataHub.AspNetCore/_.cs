@@ -1,4 +1,4 @@
-﻿using Geone.AuthorisationFilter.ResourceAuth;
+﻿using Geone.AuthorisationFilter;
 using Geone.DataHub.AspNetCore.Auth;
 using Geone.DataHub.AspNetCore.Config;
 using Geone.DataHub.Core;
@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -22,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddDataHub(this IServiceCollection services)
         {
-            services.AddSingleton(RootConfig.Value);
+            services.AddSingleton(Root.Value);
             services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
@@ -32,13 +34,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AggregateExcutor>();
             services.AddSingleton<ServiceExcutor>();
 
-            var openauthSection = configuration.GetSection("OpenAuth");
-            string host = openauthSection["Host"];
-            string role = openauthSection["AdminRole"];
-            string appKey = openauthSection["AppKey"];
-
-            //services.AddAuthorisationProlicy((sp) => new ApiProtectionProvider("apiprotection.json"));
-            services.AddAuthorisationProlicy((sp) => new ApiAuthProlicyResourceAuthProvider(configuration));
+            if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
+            {
+                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyIdentityServerProvider(Root.Value));
+            }
+            else
+            {
+                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyProvider("apiprotection.json"));
+            }
             return services;
         }
 
@@ -52,8 +55,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder RegisteSwagger2IdentityServer(this IApplicationBuilder app)
         {
-            RootConfig config = (RootConfig)app.ApplicationServices.GetService(typeof(RootConfig));
-            if (string.IsNullOrWhiteSpace(config.IdSAdmin?.BaseUrl))
+            Root config = (Root)app.ApplicationServices.GetService(typeof(Root));
+            if (string.IsNullOrWhiteSpace(config.IdentityServer?.ApiBaseUrl))
             {
                 return app;
             }
@@ -61,13 +64,13 @@ namespace Microsoft.Extensions.DependencyInjection
             MetaRepository repository = (MetaRepository)app.ApplicationServices.GetService(typeof(MetaRepository));
             var scopes = repository.Query(x => x.MetaType == MetaType.Service)
                 .Select(x => $"{config.Server.Name.ToLower()}.{x.Name.ToLower()}").ToList();
-           
+
             scopes.Add("roles");
 
-            IdSAdminClient client = new IdSAdminClient(config.IdSAdmin);
+            IdSAdminClient client = new IdSAdminClient(config.IdentityServer);
             ClientRegistry clientRegistry = new ClientRegistry()
             {
-                AllowedGrantType = "implicit",
+                AllowedGrantTypes = new List<string>() { "implicit" },
                 AllowOfflineAccess = false,
                 BaseURL = config.Server.BaseUrl,
                 AllowAccessTokensViaBrowser = true,
@@ -76,7 +79,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 ClientId = config.Server.Name + "-swagger",
                 ClientName = config.Server.Name + " swagger",
                 Description = $"数据服务Swagger[{config.Server.BaseUrl}/swagger]",
-                RedirectUri = $"{config.Server.BaseUrl}/swagger/oauth2-redirect.html"
+                RedirectUris = new List<string>() { $"{config.Server.BaseUrl}/swagger/oauth2-redirect.html" },
+                RequireClientSecret = false
             };
 
             try

@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common-lib\Infrastructure.NetStandard\Consul\Consul.csproj" />
     <ProjectReference Include="..\..\common-lib\Infrastructure.NetStandard\Geone.AuthorisationFilter\Geone.AuthorisationFilter.csproj" />
-    <ProjectReference Include="..\Geone.AuthorisationFilter.ResourceAuth\Geone.AuthorisationFilter.ResourceAuth.csproj" />
     <ProjectReference Include="..\Geone.DataHub.Core\Geone.DataHub.Core.csproj" />
     <ProjectReference Include="..\Geone.IdentityServer4.Client\Geone.IdentityServer4.Client.csproj" />
   </ItemGroup>

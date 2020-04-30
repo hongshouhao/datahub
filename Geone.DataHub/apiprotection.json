@@ -1,16 +1,22 @@
 {
   "Schemes": [
     {
-      "Key": "default",
+      "Key": "global",
       "Enable": true,
-      "IpAllowedList": [],
-      "ApiProtections": [
-      ]
+      "IpAllowedList": [ "192.168.11.11" ],
+      "ApiProtections": []
     },
     {
       "Key": "datahub-swagger",
       "Enable": true,
       "IpAllowedList": [],
+      "RequiredClaims": [
+        {
+          "ClaimType": "scope",
+          "ClaimValues": [ "datahub.soap2" ],
+          "RequireAll": true
+        }
+      ],
       "ApiProtections": [
         {
           "Key": "soap1",

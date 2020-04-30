@@ -13,6 +13,7 @@ namespace Geone.IdentityServer4.Client.Models
 
         public List<string> UserClaims { get; set; } = new List<string>();
         public List<ApiScopeRegistry> Scopes { get; set; } = new List<ApiScopeRegistry>();
+        public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 
         public void Check()
         {

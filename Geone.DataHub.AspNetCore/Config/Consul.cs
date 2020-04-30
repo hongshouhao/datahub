@@ -4,7 +4,7 @@ using System;
 
 namespace Geone.DataHub.AspNetCore.Config
 {
-    public class ConsulConfig
+    public class Consul
     {
         public string BaseUrl { get; set; }
         [JsonConverter(typeof(DurationTimespanConverter))]
