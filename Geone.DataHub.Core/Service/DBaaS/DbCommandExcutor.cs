@@ -1,9 +1,12 @@
 ﻿using Geone.DataHub.Core.APM;
 using Geone.DataHub.Core.Metadata;
 using Geone.DataHub.Core.Repository;
+using Org.BouncyCastle.Crypto.Engines;
+using ServiceStack;
 using System;
 using System.Data.Common;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Geone.DataHub.Core.Service.DBaaS
 {
@@ -40,7 +43,24 @@ namespace Geone.DataHub.Core.Service.DBaaS
                         {
                             DbParameter parameter = command.CreateParameter();
                             parameter.ParameterName = pitem.Key;
-                            parameter.Value = pitem.Value;
+
+                            if (pitem.Value != null)
+                            {
+                                string valString = pitem.Value.ToString();
+                                if (valString.StartsWith("base64:"))
+                                {
+                                    string base64 = valString.Substring(7);
+                                    parameter.Value = Encoding.UTF8.GetBytes(base64);
+                                }
+                                else
+                                {
+                                    parameter.Value = pitem.Value;
+                                }
+                            }
+                            else
+                            {
+                                parameter.Value = pitem.Value;
+                            }
 
                             command.Parameters.Add(parameter);
                         }
@@ -78,6 +98,11 @@ namespace Geone.DataHub.Core.Service.DBaaS
             }
         }
 
+        bool IsBase64(string stringValue)
+        {
+            return Regex.IsMatch("", "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$");
+        }
+
         public static Tuple<string, int> ReadJson(DbDataReader dataReader)
         {
             StringBuilder json = new StringBuilder();
@@ -91,9 +116,9 @@ namespace Geone.DataHub.Core.Service.DBaaS
                 json.Append("{");
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
-                    Type type = dataReader.GetFieldType(i);
                     json.AppendFormat("\"{0}\":", dataReader.GetName(i));
-                    string strValue = StringFormat(dataReader[i].ToString(), type);
+
+                    string strValue = StringFormat(dataReader[i], dataReader.GetFieldType(i));
 
                     if (i < dataReader.FieldCount - 1)
                     {
@@ -117,23 +142,46 @@ namespace Geone.DataHub.Core.Service.DBaaS
             return new Tuple<string, int>(json.ToString(), count);
         }
 
-        private static string StringFormat(string str, Type type)
+        private static string StringFormat(object value, Type type)
         {
-            if (type == stringType)
+            if (value == null)
             {
-                return $"\"{String2Json(str)}\"";
+                return "null";
+            }
+
+            if (type == stringType || type == charType)
+            {
+                string str = value.ToString();
+                if (str.Length == 0)
+                {
+                    return "\"\"";
+                }
+                else
+                {
+                    return $"\"{String2Json(str)}\"";
+                }
             }
             else if (type == datetimeType)
             {
-                return $"\"{str}\"";
+                return $"\"{value}\"";
             }
             else if (type == boolType)
             {
-                return str.ToLower();
+                return value.ToString().ToLower();
+            }
+            else if (type.IsNumericType() || type == byteType)
+            {
+                return $"{value}";
+            }
+            else if (type == byteArrayType)
+            {
+                byte[] bytes = value as byte[];
+                string base64 = Convert.ToBase64String(bytes);
+                return $"\"base64:{base64}\"";
             }
             else
             {
-                return $"{str}";
+                return $"\"{value}\"";
             }
         }
 
@@ -171,5 +219,8 @@ namespace Geone.DataHub.Core.Service.DBaaS
         static Type stringType = typeof(string);
         static Type datetimeType = typeof(DateTime);
         static Type boolType = typeof(bool);
+        static Type charType = typeof(char);
+        static Type byteType = typeof(byte);
+        static Type byteArrayType = typeof(byte[]);
     }
 }
