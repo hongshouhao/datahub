@@ -1,6 +1,5 @@
 using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
-using Geone.AuthorisationFilter;
 using Geone.DataHub.AspNetCore.Config;
 using Geone.DataHub.AspNetCore.Swagger;
 using Geone.DataHub.Core.APM;
@@ -8,6 +7,7 @@ using Geone.DataHub.Core.Exceptions;
 using Geone.IdentityServer4.Client;
 using Hellang.Middleware.ProblemDetails;
 using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +16,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Geone.DataHub
@@ -38,6 +37,13 @@ namespace Geone.DataHub
 
             if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
             {
+                services.AddAuthorization(x =>
+                {
+                    x.DefaultPolicy = new AuthorizationPolicyBuilder("Bearer")
+                        .RequireRole("administrator", "admin")
+                        .Build();
+                });
+
                 services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                         .AddIdentityServerAuthentication(options =>
                         {
@@ -49,28 +55,42 @@ namespace Geone.DataHub
                             options.Authority = Root.Value.IdentityServer.Authority;
                         });
             }
+            else
+            {
+                services.AddAuthorization(x =>
+                {
+                    x.DefaultPolicy = new AuthorizationPolicyBuilder()
+                        .RequireAssertion(_ => true)
+                        .Build();
+                });
+            }
 
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Data Hub Web API", Version = "v1" });
                 options.DocumentFilter<ServiceDocumentFilter>();
                 options.OperationFilter<AuthorizeCheckOperationFilter>();
+                options.MapType(typeof(IFormFile), () => new OpenApiSchema() { Type = "file", Format = "binary" });
 
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
                 {
-                    Type = SecuritySchemeType.OAuth2,
-                    Flows = new OpenApiOAuthFlows
+                    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                     {
-                        Password = new OpenApiOAuthFlow
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
                         {
-                            TokenUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/token"),
-                        },
-                        Implicit = new OpenApiOAuthFlow
-                        {
-                            AuthorizationUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/authorize"),
+                            Password = new OpenApiOAuthFlow
+                            {
+                                TokenUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/token"),
+                            },
+                            Implicit = new OpenApiOAuthFlow
+                            {
+                                AuthorizationUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/authorize"),
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
                 options.EnableAnnotations();
             });
 
@@ -102,7 +122,7 @@ namespace Geone.DataHub
             app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
             {
                 var request = httpContext.Request;
-                diagnosticContext.Set("Host", request.Host);
+                diagnosticContext.Set("IP", request.Host.Host);
                 diagnosticContext.Set("Protocol", request.Protocol);
                 diagnosticContext.Set("Scheme", request.Scheme);
 
@@ -126,8 +146,13 @@ namespace Geone.DataHub
 
                 if (Log.IsEnabled(LogEventLevel.Debug))
                 {
-                    diagnosticContext.Set("Route", string.Join(",", httpContext.Request.RouteValues.Select(x => $"{x.Key}:{x.Value}")));
-                    diagnosticContext.Set("Body", httpContext.Request.BodyAsString());
+                    diagnosticContext.Set("Route", string.Join(",", request.RouteValues.Select(x => $"{x.Key}:{x.Value}")));
+                    diagnosticContext.Set("Body", request.BodyAsString());
+                }
+                else if (httpContext.Response.StatusCode == 500)
+                {
+                    request.BodyReader.TryRead(out System.IO.Pipelines.ReadResult result);
+                    diagnosticContext.Set("Body", request.BodyAsString());
                 }
             });
 
@@ -137,7 +162,13 @@ namespace Geone.DataHub
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Data Hub Web API V1");
+                string swaggerEndpoint = "/swagger/v1/swagger.json";
+                if (!string.IsNullOrWhiteSpace(Root.Value.Server.VirtualPath))
+                {
+                    swaggerEndpoint = "/" + Root.Value.Server.VirtualPath + swaggerEndpoint;
+                }
+
+                options.SwaggerEndpoint(swaggerEndpoint, "Data Hub Web API V1");
                 options.OAuthClientId(Root.Value.Server.Name + "-swagger");
             });
 

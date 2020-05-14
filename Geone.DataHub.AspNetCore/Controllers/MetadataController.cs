@@ -14,7 +14,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
     [ApiController]
     [Route("metadata")]
     [Produces("application/json", "application/problem+json")]
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
+    [Authorize]
     public class MetadataController : ControllerBase
     {
         private readonly ILogger<MetadataController> _logger;

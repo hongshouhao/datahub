@@ -12,6 +12,8 @@ using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using ServiceStack;
+using ServiceStack.Configuration;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using System;
@@ -24,8 +26,10 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddDataHub(this IServiceCollection services)
         {
+            AddMetadataDb(services);
+            AddAuthorisationProlicyProvider(services);
+
             services.AddSingleton(Root.Value);
-            services.AddSingleton<IDbConnectionFactory>(c => new OrmLiteConnectionFactory("meta.db", SqliteDialect.Provider));
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
             services.AddSingleton<SoapExcutor>();
@@ -33,16 +37,66 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<SingleServiceExcutor>();
             services.AddSingleton<AggregateExcutor>();
             services.AddSingleton<ServiceExcutor>();
+            return services;
+        }
 
-            if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
+        private static void AddAuthorisationProlicyProvider(IServiceCollection services)
+        {
+            if (string.IsNullOrWhiteSpace(Root.Value.Server.ApiProtectionProvider))
+            {
+                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyProvider(false));
+            }
+            else if (Root.Value.Server.ApiProtectionProvider == "identityserver")
             {
                 services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyIdentityServerProvider(Root.Value));
             }
-            else
+            else if (Root.Value.Server.ApiProtectionProvider == "jsonfile")
             {
-                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyProvider("apiprotection.json"));
+                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyJsonFileProvider());
             }
-            return services;
+        }
+
+        private static void AddMetadataDb(IServiceCollection services)
+        {
+            IOrmLiteDialectProvider ormLiteDialect;
+            string connectionString = Root.Value.MetadataDb?.ConnectionString;
+
+            switch (Root.Value.MetadataDb?.Type?.ToLower())
+            {
+                case "mssql":
+                    ormLiteDialect = SqlServer2012Dialect.Provider;
+                    break;
+                case "mssql2008":
+                    ormLiteDialect = SqlServer2008Dialect.Provider;
+                    break;
+                case "mssql2012":
+                    ormLiteDialect = SqlServer2012Dialect.Provider;
+                    break;
+                case "mssql2016":
+                    ormLiteDialect = SqlServer2016Dialect.Provider;
+                    break;
+                case "mysql":
+                    ormLiteDialect = MySqlDialect.Provider;
+                    break;
+                case "pgsql":
+                    ormLiteDialect = PostgreSqlDialect.Provider;
+                    break;
+                default:
+                case "sqlite":
+                    ormLiteDialect = SqliteDialect.Provider;
+                    if (string.IsNullOrWhiteSpace(connectionString))
+                    {
+                        connectionString = "meta.db";
+                    }
+                    break;
+            }
+
+            if (ormLiteDialect != SqliteDialect.Provider && string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new Exception("元数据存储库配置错误");
+            }
+
+            services.AddSingleton((Func<IServiceProvider, IDbConnectionFactory>)(c => new OrmLiteConnectionFactory(connectionString, ormLiteDialect)));
         }
 
         public static IApplicationBuilder SetupDataHub(this IApplicationBuilder app)
@@ -55,7 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder RegisteSwagger2IdentityServer(this IApplicationBuilder app)
         {
-            Root config = (Root)app.ApplicationServices.GetService(typeof(Root));
+            Root config = Root.Value;
             if (string.IsNullOrWhiteSpace(config.IdentityServer?.ApiBaseUrl))
             {
                 return app;

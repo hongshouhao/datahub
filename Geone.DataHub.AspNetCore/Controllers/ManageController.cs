@@ -6,6 +6,7 @@ using Geone.DataHub.Core.Metadata;
 using Geone.DataHub.Core.Repository;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,6 +17,7 @@ namespace Geone.DataHub.AspNetCore.Controllers
 {
     [ApiController]
     [Route("manage")]
+    [Authorize]
     public class ManageController : ControllerBase
     {
         private readonly Root _configRoot;
@@ -32,10 +34,10 @@ namespace Geone.DataHub.AspNetCore.Controllers
         }
 
         [HttpPost]
-        [Route("reloadAuthorizationScheme")]
-        public ProtectionConfiguration ReloadAuthorizationScheme()
+        [Route("authorizeSchemes/load/{version}")]
+        public ProtectionConfiguration ReloadAuthorizeScheme([FromRoute]string version)
         {
-            return _prolicyProvider.Reload();
+            return _prolicyProvider.Load(version);
         }
 
         [HttpPost]

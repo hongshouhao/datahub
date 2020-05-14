@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Diagnostics;
 
 namespace Geone.DataHub
 {
@@ -18,9 +19,11 @@ namespace Geone.DataHub
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.CaptureStartupErrors(true)
+                    Root.Read();
+                    IWebHostBuilder webHostBuilder = webBuilder.CaptureStartupErrors(true)
+                              .UseIISIntegration()
+                              .UseKestrel()
                               .UseSetting("detailedErrors", "true")
-                              .UseUrls(Root.Read().Server.ToString())
                               .UseStartup<Startup>()
                               .ConfigureLogging(builder =>
                               {
@@ -32,6 +35,12 @@ namespace Geone.DataHub
                                   configuration.ReadFrom.Configuration(context.Configuration, "Serilog")
                                     .Enrich.WithElasticApmCorrelationInfo();
                               });
+
+                    Process cur = Process.GetCurrentProcess();
+                    if (cur.ProcessName != "w3wp")
+                    {
+                        webHostBuilder.UseUrls(Root.Value.Server.ToString());
+                    }
                 });
     }
 }

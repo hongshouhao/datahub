@@ -27,6 +27,7 @@ namespace Geone.DataHub.AspNetCore.Config
             return Value;
         }
 
+        public MetadataDb MetadataDb { get; set; }
         public Consul Consul { get; set; }
         public Server Server { get; set; }
         public IdSConfig IdentityServer { get; set; }

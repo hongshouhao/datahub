@@ -14,7 +14,7 @@ namespace Geone.DataHub.AspNetCore.Auth
         public ApiProtectionProlicyIdentityServerProvider(Root root)
         {
             _root = root;
-            Reload();
+            _prolicyProvider = new ApiProtectionProlicyProvider();
         }
 
         public ProtectionConfiguration GetConfiguration()
@@ -43,22 +43,18 @@ namespace Geone.DataHub.AspNetCore.Auth
             return _prolicyProvider.GetProlicy(apiKey, actionContext);
         }
 
-        public ProtectionConfiguration Reload()
+        public ProtectionConfiguration Load(string version)
         {
             IdSAdminClient client = new IdSAdminClient(_root.IdentityServer);
             ApiResourceRegistry apiResource = client.GetApiResource(_root.Server.Name, false);
-            if (apiResource == null)
+            if (apiResource != null)
             {
-                _prolicyProvider = new ApiProtectionProlicyProvider("{}");
-            }
-            else
-            {
-                apiResource.Properties.TryGetValue("AuthScheme", out string json);
-                if (string.IsNullOrWhiteSpace(json)) json = "{}";
-                _prolicyProvider = new ApiProtectionProlicyProvider(json);
+                apiResource.Properties.TryGetValue(version, out string json);
+                if (!string.IsNullOrWhiteSpace(json))
+                    _prolicyProvider.Load(json);
             }
 
-            return _prolicyProvider.Reload();
+            return _prolicyProvider.GetConfiguration();
         }
     }
 }

@@ -6,6 +6,7 @@ using Geone.DataHub.Core.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Linq;
 
@@ -36,16 +37,24 @@ namespace Geone.DataHub.AspNetCore.Controllers
         [HttpPost]
         [Route("{name}")]
         [DynamicAuthorize]
-        public object Post(string name, [FromBody]object arguments)
+        public object Post([FromRoute]string name, [FromBody]object arguments)
         {
             MetaEntity entity = _repository.Get(MetaType.Service, name);
             ServiceMeta serviceMeta = entity.GetMetadata() as ServiceMeta;
-            return _excutor.Excute(serviceMeta, arguments);
+            var result = _excutor.Excute(serviceMeta, arguments);
+            if (result is string)
+            {
+                return new JRaw(result);
+            }
+            else
+            {
+                return result;
+            }
         }
 
         [HttpGet]
         [Route("apis")]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "administrator")]
+        [Authorize]
         public object APIs()
         {
             return _repository.Query(x => x.MetaType == MetaType.Service)
