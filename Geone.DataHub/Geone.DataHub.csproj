@@ -25,15 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="meta.db">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\common-lib\Infrastructure.NetStandard\ProblemDetails\ProblemDetails.csproj" />
     <ProjectReference Include="..\Geone.DataHub.AspNetCore\Geone.DataHub.AspNetCore.csproj" />
     <ProjectReference Include="..\Geone.DataHub.Core\Geone.DataHub.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="meta.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,9 @@ using IdentityModel.Client;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 
 namespace Geone.IdentityServer4.Client
@@ -29,7 +32,8 @@ namespace Geone.IdentityServer4.Client
                 ClientId = _config.ClientId,
                 ClientSecret = _config.ClientSecret,
                 UserName = _config.UserName,
-                Password = _config.Password
+                Password = _config.Password,
+                Scope = _config.Scopes
             }).Result;
 
             if (tokenResponse.IsError)
@@ -101,7 +105,7 @@ namespace Geone.IdentityServer4.Client
             }
         }
 
-        public User[] GetUsers()
+        public User[] GetUsers(bool includeClaims = true)
         {
             var request = new RestRequest("api/Users", Method.GET);
             request.AddParameter("page", "1");
@@ -110,10 +114,52 @@ namespace Geone.IdentityServer4.Client
             IRestResponse response = ExcuteRequest(request);
             if (!response.IsSuccessful)
             {
-                throw new IdSException("获取所有用户失败: \r\n" + response.Content, (int)response.StatusCode);
+                throw new IdSException("获取所有用户失败: \r\n" + response.StatusDescription, (int)response.StatusCode);
             }
 
-            return JObject.Parse(response.Content)["users"].ToObject<User[]>();
+            JToken jtoken = JObject.Parse(response.Content)["users"];
+
+            if (includeClaims)
+            {
+                UserWithId[] users = jtoken.ToObject<UserWithId[]>();
+
+                foreach (var item in users)
+                {
+                    item.Claims = GetUserClaims(item.Id);
+                    item.Claims.TryGetValue("cnname", out string name);
+                    item.Alias = name;
+                }
+
+                return users;
+            }
+            else
+            {
+                return jtoken.ToObject<User[]>();
+            }
+        }
+
+        public Dictionary<string, string> GetUserClaims(string id)
+        {
+            var request = new RestRequest("api/Users/{id}/Claims", Method.GET);
+            request.AddUrlSegment("id", id);
+            request.AddParameter("page", "1");
+            request.AddParameter("pageSize", int.MaxValue);
+
+            IRestResponse response = ExcuteRequest(request);
+            if (!response.IsSuccessful)
+            {
+                throw new IdSException("获取用户声明失败: \r\n" + response.Content, (int)response.StatusCode);
+            }
+
+            JToken[] array = JToken.Parse(response.Content)["claims"].ToArray();
+
+            Dictionary<string, string> claims = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in array)
+            {
+                claims.Add(item["claimType"].ToString(), item["claimValue"].ToString());
+            }
+
+            return claims;
         }
 
         IRestResponse ExcuteRequest(IRestRequest request)

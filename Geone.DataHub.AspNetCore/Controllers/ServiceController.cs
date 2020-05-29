@@ -58,8 +58,15 @@ namespace Geone.DataHub.AspNetCore.Controllers
         public object APIs()
         {
             return _repository.Query(x => x.MetaType == MetaType.Service)
-                  .Select(x => new { Name = x.Name, URL = $"{Request.Host}/{serviceRoute}/{x.Name}" })
-                  .ToArray();
+                .ToArray()
+                .Select(x => new
+                {
+                    Name = x.Name,
+                    Parh = $"/{serviceRoute}/{x.Name}",
+                    FullUrl = $"{Request.Host}/{serviceRoute}/{x.Name}",
+                    Description = x.Description
+                })
+                .ToArray();
         }
     }
 }

@@ -11,6 +11,7 @@ using Geone.DataHub.Core.Service.SOAP;
 using Geone.IdentityServer4.Client;
 using Geone.IdentityServer4.Client.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using ServiceStack;
 using ServiceStack.Configuration;
@@ -24,12 +25,12 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class _
     {
-        public static IServiceCollection AddDataHub(this IServiceCollection services)
+        public static IServiceCollection AddDataHub(this IServiceCollection services, string webRootPath)
         {
-            AddMetadataDb(services);
+            AddMetadataDb(services, webRootPath);
             AddAuthorisationProlicyProvider(services);
 
-            services.AddSingleton(Root.Value);
+            services.AddSingleton(AppSettings.Value);
             services.AddSingleton<MetaRepository>();
             services.AddSingleton<DBaaSExcutor>();
             services.AddSingleton<SoapExcutor>();
@@ -42,29 +43,29 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void AddAuthorisationProlicyProvider(IServiceCollection services)
         {
-            if (string.IsNullOrWhiteSpace(Root.Value.Server.ApiProtectionProvider))
+            if (string.IsNullOrWhiteSpace(AppSettings.Value.Server.ApiProtectionProvider))
             {
                 services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyProvider(false));
             }
-            else if (Root.Value.Server.ApiProtectionProvider == "identityserver")
+            else if (AppSettings.Value.Server.ApiProtectionProvider == "identityserver")
             {
-                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyIdentityServerProvider(Root.Value));
+                services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyIdentityServerProvider(AppSettings.Value));
             }
-            else if (Root.Value.Server.ApiProtectionProvider == "jsonfile")
+            else if (AppSettings.Value.Server.ApiProtectionProvider == "jsonfile")
             {
                 services.AddAuthorisationProlicy((sp) => new ApiProtectionProlicyJsonFileProvider());
             }
         }
 
-        private static void AddMetadataDb(IServiceCollection services)
+        private static void AddMetadataDb(IServiceCollection services, string webRootPath)
         {
             IOrmLiteDialectProvider ormLiteDialect;
-            string connectionString = Root.Value.MetadataDb?.ConnectionString;
+            string connectionString = AppSettings.Value.MetadataDb?.ConnectionString;
 
-            switch (Root.Value.MetadataDb?.Type?.ToLower())
+            switch (AppSettings.Value.MetadataDb?.Type?.ToLower())
             {
                 case "mssql":
-                    ormLiteDialect = SqlServer2012Dialect.Provider;
+                    ormLiteDialect = SqlServerDialect.Provider;
                     break;
                 case "mssql2008":
                     ormLiteDialect = SqlServer2008Dialect.Provider;
@@ -109,7 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder RegisteSwagger2IdentityServer(this IApplicationBuilder app)
         {
-            Root config = Root.Value;
+            AppSettings config = AppSettings.Value;
             if (string.IsNullOrWhiteSpace(config.IdentityServer?.ApiBaseUrl))
             {
                 return app;

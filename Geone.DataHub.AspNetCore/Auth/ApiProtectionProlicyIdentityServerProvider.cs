@@ -8,10 +8,10 @@ namespace Geone.DataHub.AspNetCore.Auth
 {
     public class ApiProtectionProlicyIdentityServerProvider : IApiProtectionProlicyProvider
     {
-        private Root _root;
+        private AppSettings _root;
         private IApiProtectionProlicyProvider _prolicyProvider;
 
-        public ApiProtectionProlicyIdentityServerProvider(Root root)
+        public ApiProtectionProlicyIdentityServerProvider(AppSettings root)
         {
             _root = root;
             _prolicyProvider = new ApiProtectionProlicyProvider();

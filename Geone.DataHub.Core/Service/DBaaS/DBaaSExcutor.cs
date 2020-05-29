@@ -52,10 +52,10 @@ namespace Geone.DataHub.Core.Service.DBaaS
                 propName = $"@{jprop.Name}";
             }
             object val = ((JValue)jprop.Value).Value;
-            if (val == null)
-            {
-                throw new ArgumentException($"参数错误: {propName}值不能为空");
-            }
+            //if (val == null)
+            //{
+            //    throw new ArgumentException($"参数错误: {propName}值不能为空");
+            //}
             cmd.Parameters.Add(propName, val);
         }
     }

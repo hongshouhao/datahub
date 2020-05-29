@@ -1,12 +1,10 @@
 ﻿using Geone.DataHub.Core.APM;
 using Geone.DataHub.Core.Metadata;
 using Geone.DataHub.Core.Repository;
-using Org.BouncyCastle.Crypto.Engines;
 using ServiceStack;
 using System;
 using System.Data.Common;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Geone.DataHub.Core.Service.DBaaS
 {
@@ -59,7 +57,7 @@ namespace Geone.DataHub.Core.Service.DBaaS
                             }
                             else
                             {
-                                parameter.Value = pitem.Value;
+                                parameter.Value = DBNull.Value;
                             }
 
                             command.Parameters.Add(parameter);
@@ -98,11 +96,6 @@ namespace Geone.DataHub.Core.Service.DBaaS
             }
         }
 
-        bool IsBase64(string stringValue)
-        {
-            return Regex.IsMatch("", "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$");
-        }
-
         public static Tuple<string, int> ReadJson(DbDataReader dataReader)
         {
             StringBuilder json = new StringBuilder();
@@ -116,7 +109,12 @@ namespace Geone.DataHub.Core.Service.DBaaS
                 json.Append("{");
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
-                    json.AppendFormat("\"{0}\":", dataReader.GetName(i));
+                    string key = dataReader.GetName(i);
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        key = $"Unknow" + i;
+                    }
+                    json.AppendFormat("\"{0}\":", key);
 
                     string strValue = StringFormat(dataReader[i], dataReader.GetFieldType(i));
 
@@ -144,7 +142,7 @@ namespace Geone.DataHub.Core.Service.DBaaS
 
         private static string StringFormat(object value, Type type)
         {
-            if (value == null)
+            if (value == null || value == DBNull.Value)
             {
                 return "null";
             }

@@ -9,5 +9,6 @@
         public string GrantType { get; set; } = "password";
         public string UserName { get; set; } = "admin";
         public string Password { get; set; } = "Pa$$word123";
+        public string Scopes { get; set; }
     }
 }

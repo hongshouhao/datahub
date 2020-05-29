@@ -8,18 +8,18 @@ using System.Runtime.Serialization;
 
 namespace Geone.DataHub.AspNetCore.Config
 {
-    public class Root
+    public class AppSettings
     {
-        public static Root Value { get; private set; }
-        public static Root Read()
+        public static AppSettings Value { get; private set; }
+        public static AppSettings Read()
         {
             if (File.Exists("appsettings.json"))
             {
-                Value = JsonConvert.DeserializeObject<Root>(File.ReadAllText("appsettings.json"));
+                Value = JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText("appsettings.json"));
             }
             else
             {
-                Value = new Root()
+                Value = new AppSettings()
                 {
                     Server = new Server()
                 };

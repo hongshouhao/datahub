@@ -19,7 +19,7 @@ namespace Geone.DataHub
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    Root.Read();
+                    AppSettings.Read();
                     IWebHostBuilder webHostBuilder = webBuilder.CaptureStartupErrors(true)
                               .UseIISIntegration()
                               .UseKestrel()
@@ -39,7 +39,7 @@ namespace Geone.DataHub
                     Process cur = Process.GetCurrentProcess();
                     if (cur.ProcessName != "w3wp")
                     {
-                        webHostBuilder.UseUrls(Root.Value.Server.ToString());
+                        webHostBuilder.UseUrls(AppSettings.Value.Server.ToString());
                     }
                 });
     }

@@ -9,6 +9,7 @@ using Hellang.Middleware.ProblemDetails;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,20 +23,22 @@ namespace Geone.DataHub
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _configuration = configuration;
+            _environment = environment;
         }
 
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDataHub();
+            services.AddDataHub(_environment.WebRootPath);
             services.AddHttpClient();
             services.AddHttpContextAccessor();
 
-            if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
+            if (!string.IsNullOrWhiteSpace(AppSettings.Value.IdentityServer?.Authority))
             {
                 services.AddAuthorization(x =>
                 {
@@ -50,9 +53,9 @@ namespace Geone.DataHub
                             options.RequireHttpsMetadata = false;
                             options.RoleClaimType = "role";
                             options.NameClaimType = "name";
-                            options.ApiName = Root.Value.Server.Name;
-                            options.ApiSecret = Root.Value.Server.ApiSecret;
-                            options.Authority = Root.Value.IdentityServer.Authority;
+                            options.ApiName = AppSettings.Value.Server.Name;
+                            options.ApiSecret = AppSettings.Value.Server.ApiSecret;
+                            options.Authority = AppSettings.Value.IdentityServer.Authority;
                         });
             }
             else
@@ -72,7 +75,7 @@ namespace Geone.DataHub
                 options.OperationFilter<AuthorizeCheckOperationFilter>();
                 options.MapType(typeof(IFormFile), () => new OpenApiSchema() { Type = "file", Format = "binary" });
 
-                if (!string.IsNullOrWhiteSpace(Root.Value.IdentityServer?.Authority))
+                if (!string.IsNullOrWhiteSpace(AppSettings.Value.IdentityServer?.Authority))
                 {
                     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                     {
@@ -81,11 +84,11 @@ namespace Geone.DataHub
                         {
                             Password = new OpenApiOAuthFlow
                             {
-                                TokenUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/token"),
+                                TokenUrl = new Uri(AppSettings.Value.IdentityServer.Authority.Trim('/') + "/connect/token"),
                             },
                             Implicit = new OpenApiOAuthFlow
                             {
-                                AuthorizationUrl = new Uri(Root.Value.IdentityServer.Authority.Trim('/') + "/connect/authorize"),
+                                AuthorizationUrl = new Uri(AppSettings.Value.IdentityServer.Authority.Trim('/') + "/connect/authorize"),
                             }
                         }
                     });
@@ -163,13 +166,13 @@ namespace Geone.DataHub
             app.UseSwaggerUI(options =>
             {
                 string swaggerEndpoint = "/swagger/v1/swagger.json";
-                if (!string.IsNullOrWhiteSpace(Root.Value.Server.VirtualPath))
+                if (!string.IsNullOrWhiteSpace(AppSettings.Value.Server.VirtualPath))
                 {
-                    swaggerEndpoint = "/" + Root.Value.Server.VirtualPath + swaggerEndpoint;
+                    swaggerEndpoint = "/" + AppSettings.Value.Server.VirtualPath + swaggerEndpoint;
                 }
 
                 options.SwaggerEndpoint(swaggerEndpoint, "Data Hub Web API V1");
-                options.OAuthClientId(Root.Value.Server.Name + "-swagger");
+                options.OAuthClientId(AppSettings.Value.Server.Name + "-swagger");
             });
 
             app.UseRouting();

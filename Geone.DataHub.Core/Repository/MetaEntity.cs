@@ -3,11 +3,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ServiceStack.DataAnnotations;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Geone.DataHub.Core.Repository
 {
+    [Alias("datahub_metadata")]
     public class MetaEntity : IAudit
     {
+        [PrimaryKey]
         [AutoIncrement]
         public int Id { get; set; }
         [Required]

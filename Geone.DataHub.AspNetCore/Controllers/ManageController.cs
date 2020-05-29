@@ -20,12 +20,12 @@ namespace Geone.DataHub.AspNetCore.Controllers
     [Authorize]
     public class ManageController : ControllerBase
     {
-        private readonly Root _configRoot;
+        private readonly AppSettings _configRoot;
         private readonly MetaRepository _repository;
         private readonly IApiProtectionProlicyProvider _prolicyProvider;
         private readonly ILogger<ManageController> _logger;
 
-        public ManageController(Root configRoot, MetaRepository repository, IApiProtectionProlicyProvider prolicyProvider, ILogger<ManageController> logger)
+        public ManageController(AppSettings configRoot, MetaRepository repository, IApiProtectionProlicyProvider prolicyProvider, ILogger<ManageController> logger)
         {
             _configRoot = configRoot;
             _repository = repository;

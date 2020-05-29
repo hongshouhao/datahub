@@ -58,7 +58,7 @@ namespace Geone.DataHub.AspNetCore.Swagger
                                 {
                                     Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
                                 },
-                                new[] { Root.Value.Server.Name + "." + svcEntity.Name }
+                                new[] { AppSettings.Value.Server.Name + "." + svcEntity.Name }
                             }
                         }
                     };
