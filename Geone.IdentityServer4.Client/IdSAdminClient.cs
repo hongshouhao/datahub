@@ -104,110 +104,7 @@ namespace Geone.IdentityServer4.Client
                 throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
             }
         }
-        /// <summary>
-        /// 检查用户是否存在
-        /// </summary>
-        /// <param name="account"></param>
-        /// <returns></returns>
-        public bool CheckUser(string account) {
 
-
-            User target = GetUsers()?.FirstOrDefault(u => u.UserName.ToLower() == account.ToLower() );
-            
-            if (target == null)
-            {
-                return false;
-            }
-            return true;
-        } 
-        public string SaveUser(SaveUserDto input)
-        { 
-            IRestRequest request = new RestRequest("/api/Users", Method.POST, DataFormat.Json);
-            request = request.AddJsonBody(input);
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(新增用户)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        } 
-        public string UpdateUser(UpdateUserDto input)
-        {
-            IRestRequest request = new RestRequest("/api/Users", Method.PUT, DataFormat.Json);
-            request = request.AddJsonBody(input);
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(修改用户)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        } 
-        public string DeleteUser(Guid id)
-        {
-            IRestRequest request = new RestRequest("/api/Users/{id}", Method.DELETE, DataFormat.Json); 
-            request.AddUrlSegment("id", id);
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(删除用户)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        }
-        public string ChangePassword(UpdatePasswordInput input)
-        {
-            IRestRequest request = new RestRequest("/api/Users/ChangePassword", Method.POST, DataFormat.Json);
-            request = request.AddJsonBody(input);
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        }
-        public string SaveClaims(SaveClaimsInput input)
-        {  
-            IRestRequest request = new RestRequest("/api/Users/Claims", Method.POST, DataFormat.Json);
-            request = request.AddJsonBody(input);
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        }
-        public string DeleteClaimsCnName(Guid userId)
-        {
-            var dic = GetUserClaims(userId.ToString(), "claimId");
-            dic.TryGetValue("cnname", out string claimId);
-
-            IRestRequest request = new RestRequest("/api/Users/{id}/Claims", Method.DELETE, DataFormat.Json);
-            request.AddUrlSegment("id", userId);
-            request.AddParameter("claimId", claimId); 
-            IRestResponse response = ExcuteRequest(request);
-            if (response.IsSuccessful)
-            {
-                return response.Content;
-            }
-            else
-            {
-                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
-            }
-        }
         public User[] GetUsers(bool includeClaims = true)
         {
             var request = new RestRequest("api/Users", Method.GET);
@@ -241,7 +138,111 @@ namespace Geone.IdentityServer4.Client
             }
         }
 
-        public Dictionary<string, string> GetUserClaims(string id,string valueType= "claimValue")
+        public bool IfExistsUser(string account)
+        {
+            User target = GetUsers()?.FirstOrDefault(u => u.UserName.ToLower() == account.ToLower());
+            if (target == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public string SaveUser(SaveUserDto input)
+        {
+            IRestRequest request = new RestRequest("/api/Users", Method.POST, DataFormat.Json);
+            request = request.AddJsonBody(input);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(新增用户)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public string UpdateUser(UpdateUserDto input)
+        {
+            IRestRequest request = new RestRequest("/api/Users", Method.PUT, DataFormat.Json);
+            request = request.AddJsonBody(input);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(修改用户)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public string DeleteUser(Guid id)
+        {
+            IRestRequest request = new RestRequest("/api/Users/{id}", Method.DELETE, DataFormat.Json);
+            request.AddUrlSegment("id", id);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(删除用户)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public string ChangePassword(UpdatePasswordInput input)
+        {
+            IRestRequest request = new RestRequest("/api/Users/ChangePassword", Method.POST, DataFormat.Json);
+            request = request.AddJsonBody(input);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public string SaveClaims(SaveClaimsInput input)
+        {
+            IRestRequest request = new RestRequest("/api/Users/Claims", Method.POST, DataFormat.Json);
+            request = request.AddJsonBody(input);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public string DeleteClaimsCnName(Guid userId)
+        {
+            var dic = GetUserClaims(userId.ToString(), "claimId");
+            dic.TryGetValue("cnname", out string claimId);
+
+            IRestRequest request = new RestRequest("/api/Users/{id}/Claims", Method.DELETE, DataFormat.Json);
+            request.AddUrlSegment("id", userId);
+            request.AddParameter("claimId", claimId);
+            IRestResponse response = ExcuteRequest(request);
+            if (response.IsSuccessful)
+            {
+                return response.Content;
+            }
+            else
+            {
+                throw new IdSException($"调用IdS4 RESTful API失败(注册客户端)\r\n: {response.Content}", (int)response.StatusCode);
+            }
+        }
+
+        public Dictionary<string, string> GetUserClaims(string id, string valueType = "claimValue")
         {
             var request = new RestRequest("api/Users/{id}/Claims", Method.GET);
             request.AddUrlSegment("id", id);
